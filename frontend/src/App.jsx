@@ -9,6 +9,8 @@ import Marketplace from './pages/Marketplace'
 import Authentication from './pages/Authentication'
 import Contact from './pages/ContactUs'
 import Footer from './components/Footer'
+import "bootstrap/dist/css/bootstrap.min.css";
+
 const App = () => {
   return (
     <div>
