@@ -1,10 +1,23 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import logo from "../assets/farm-logo.jpg";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
+  // Retrieve user data from localStorage
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  const role = user?.role || "guest";
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("loggedInUser");
+    alert("Logged out successfully!");
+    navigate("/authentication");
+  };
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm sticky-top">
       <div className="container">
@@ -39,6 +52,7 @@ const Navbar = () => {
           id="navbarNav"
         >
           <ul className="navbar-nav">
+            {/* Common links for all users */}
             <li className="nav-item">
               <NavLink className="nav-link" to="/">
                 Home
@@ -49,21 +63,48 @@ const Navbar = () => {
                 About
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/farmerdash">
-                Dashboard
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/marketplace">
-                Marketplace
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink className="nav-link" to="/modelhub">
-                ModelHub
-              </NavLink>
-            </li>
+
+            {/* Role-based routes */}
+            {role === "guest" && (
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/marketplace">
+                  Marketplace
+                </NavLink>
+              </li>
+            )}
+
+            {role === "enduser" && (
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/marketplace">
+                  Marketplace
+                </NavLink>
+              </li>
+            )}
+
+            {role === "farmer" && (
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/farmerdash">
+                  Dashboard
+                </NavLink>
+              </li>
+            )}
+
+            {role === "admin" && (
+              <>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/admindash">
+                    Admin Dashboard
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/marketplace">
+                    Marketplace
+                  </NavLink>
+                </li>
+              </>
+            )}
+
+            {/* Common Contact Page */}
             <li className="nav-item">
               <NavLink className="nav-link" to="/contact">
                 Contact
@@ -71,13 +112,24 @@ const Navbar = () => {
             </li>
           </ul>
         </div>
-        <div>
-          <Link
-            className="btn btn-success ms-lg-3 px-3 py-1 justify-content-end"
-            to="/authentication"
-          >
-            Login
-          </Link>
+
+        {/* Right-side Auth Buttons */}
+        <div className="d-flex align-items-center">
+          {!user ? (
+            <Link
+              className="btn btn-success ms-lg-3 px-3 py-1"
+              to="/authentication"
+            >
+              Login
+            </Link>
+          ) : (
+            <button
+              className="btn btn-danger ms-lg-3 px-3 py-1"
+              onClick={handleLogout}
+            >
+              Logout ({user.username})
+            </button>
+          )}
         </div>
       </div>
     </nav>
