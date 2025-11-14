@@ -1,0 +1,80 @@
+/* Smooth Green Underline Animation */
+.animated-link {
+  position: relative;
+  padding-bottom: 5px;
+}
+
+.animated-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 0;
+  background-color: #28a745;
+  transition: width 0.3s ease-in-out;
+  border-radius: 10px;
+}
+
+.animated-link:hover::after,
+.animated-link.active::after {
+  width: 100%;
+}
+
+/* Dropdown Container */
+.dropdown-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.user-icon {
+  background: #e8f5e9;
+  padding: 8px 15px;
+  border-radius: 30px;
+  font-weight: 600;
+  border: 1px solid #c8e6c9;
+  transition: all 0.3s ease-in-out;
+}
+
+.user-icon:hover {
+  background: #c8e6c9;
+}
+
+/* Smooth Dropdown Menu */
+.dropdown-menu-custom {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  background: white;
+  width: 170px;
+  box-shadow: 0px 5px 18px rgba(0,0,0,0.15);
+  border-radius: 10px;
+  padding: 10px 0;
+  animation: dropdownFade 0.3s ease forwards;
+  z-index: 999;
+}
+
+@keyframes dropdownFade {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dropdown Items */
+.dropdown-item-custom {
+  padding: 10px 18px;
+  font-size: 16px;
+  text-decoration: none;
+  color: #333;
+  display: block;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item-custom:hover {
+  background: #f1f1f1;
+}

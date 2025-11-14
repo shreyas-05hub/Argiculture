@@ -12,6 +12,7 @@ import Footer from './components/Footer'
 import "bootstrap/dist/css/bootstrap.min.css";
 import Login from './components/auth/Login'
 import Signup from './components/auth/Signup'
+import UserProfile from './pages/UserProfile'
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
         <Route path='/authentication' element={<Authentication/>}/>
         <Route path='/login' element={<Login/>}/>
         <Route path='/signup' element={<Signup/>}/>
+        <Route path='/profile' element={<UserProfile/>}/>
       </Routes>
       <Footer/>
     </div>
