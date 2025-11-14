@@ -1,0 +1,65 @@
+.homepage {
+    font-family: "Poppins", sans-serif;
+    scroll-behavior: smooth;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(rgba(0, 100, 0, 0.6),
+            rgba(0, 100, 0, 0.6)),
+        url("https://images.unsplash.com/photo-1606112219348-204d7d8b94ee") center/cover no-repeat;
+    height: 100vh;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.hero-content {
+    max-width: 700px;
+    padding: 20px;
+}
+
+.workflow-step:hover {
+    background-color: #eafbea;
+    transform: translateY(-6px);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    transition: 0.3s;
+}
+
+/* Simple fade/slide/zoom animations */
+.animate {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s ease-in-out;
+}
+
+.animate.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Subtle zoom for hero text */
+.hero-section .hero-content {
+    transform: scale(0.95);
+    transition: transform 1.2s ease, opacity 1s;
+    opacity: 0;
+}
+
+.hero-section.animate.show .hero-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Workflow & Features pop-up effect */
+.workflow-step,
+.card {
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.workflow-step:hover,
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 128, 0, 0.15);
+}

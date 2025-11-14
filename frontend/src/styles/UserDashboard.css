@@ -1,0 +1,56 @@
+/* 📱 Mobile-first Responsive Fixes */
+
+@media (max-width: 768px) {
+    .card.p-3.shadow-sm.d-flex.flex-md-row {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        text-align: center !important;
+    }
+
+    .card.p-3.shadow-sm.d-flex.flex-md-row img {
+        margin: 0 auto 10px auto;
+    }
+
+    .card.p-3.shadow-sm.d-flex.flex-md-row .d-flex.align-items-center.gap-3 {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .card.p-3.shadow-sm.d-flex.flex-md-row .form-control {
+        width: 100% !important;
+    }
+
+    /* Category buttons center align */
+    .d-flex.flex-wrap.gap-2.mt-3 {
+        justify-content: center !important;
+    }
+
+    /* Crop cards - 2 per row on small screens */
+    .col-sm-6 {
+        flex: 0 0 50% !important;
+        max-width: 50% !important;
+    }
+
+    @media (max-width: 480px) {
+
+        /* 1 per row for very small phones */
+        .col-sm-6 {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+        }
+    }
+
+    /* Cart section tweaks */
+    .card.mt-4.p-3.shadow-sm .d-flex.align-items-center {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .card.mt-4.p-3.shadow-sm img {
+        width: 50px !important;
+    }
+
+    .card.mt-4.p-3.shadow-sm button {
+        font-size: 0.85rem;
+    }
+}
