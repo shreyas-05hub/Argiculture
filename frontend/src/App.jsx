@@ -4,7 +4,7 @@ import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import About from './pages/About'
 import ModelHub from './pages/ModelHub'
-import FarmerDash from './pages/FarmerDash'
+import Dashboard from './pages/Dashboard'
 import Marketplace from './pages/Marketplace'
 import Authentication from './pages/Authentication'
 import Contact from './pages/ContactUs'
@@ -22,7 +22,7 @@ const App = () => {
         <Route path='/' element={<Home/>}/>
         <Route path='/about' element={<About/>}/>
         <Route path='/modelhub' element={<ModelHub/>}/>
-        <Route path='/farmerdash' element={<FarmerDash/>}/>
+        <Route path='/dashboard' element={<Dashboard/>}/>
         <Route path='/marketplace' element={<Marketplace/>}/>
         <Route path='/contact' element={<Contact/>}/>
         <Route path='/authentication' element={<Authentication/>}/>

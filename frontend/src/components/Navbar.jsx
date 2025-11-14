@@ -82,7 +82,7 @@ const Navbar = () => {
 
             {role === "farmer" && (
               <li className="nav-item">
-                <NavLink className="nav-link animated-link" to="/farmerdash">
+                <NavLink className="nav-link animated-link" to="/dashboard">
                   Dashboard
                 </NavLink>
               </li>
