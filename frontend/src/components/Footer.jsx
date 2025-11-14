@@ -24,7 +24,7 @@ const Footer = () => {
               <li><Link to="/" className="text-light text-decoration-none">Home</Link></li>
               <li><Link to="/about" className="text-light text-decoration-none">About</Link></li>
               <li><Link to="/marketplace" className="text-light text-decoration-none">Marketplace</Link></li>
-              <li><Link to="/modelhub" className="text-light text-decoration-none">AI Models</Link></li>
+              {/* <li><Link to="/modelhub" className="text-light text-decoration-none">AI Models</Link></li> */}
               <li><Link to="/contact" className="text-light text-decoration-none">Contact</Link></li>
             </ul>
           </div>

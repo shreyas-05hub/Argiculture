@@ -4,31 +4,31 @@ import Navbar from './components/Navbar'
 import Home from './pages/Home'
 import About from './pages/About'
 import ModelHub from './pages/ModelHub'
-import Dashboard from './pages/Dashboard'
+import FarmerDash from './pages/FarmerDash'
 import Marketplace from './pages/Marketplace'
 import Authentication from './pages/Authentication'
 import Contact from './pages/ContactUs'
 import Footer from './components/Footer'
 import "bootstrap/dist/css/bootstrap.min.css";
-import FarmerDashboard from './components/FarmerDashboard'
-import UserDashboard from './components/UserDashboard'
-import AdminDashboard from './components/AdminDashboard'
+import Login from './components/auth/Login'
+import Signup from './components/auth/Signup'
+import UserProfile from './pages/UserProfile'
 
 const App = () => {
   return (
-    <div className='container-fluid'>
+    <div>
       <Navbar/>
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/about' element={<About/>}/>
         <Route path='/modelhub' element={<ModelHub/>}/>
-        <Route path='/dashboard' element={<Dashboard/>}/>
+        <Route path='/farmerdash' element={<FarmerDash/>}/>
         <Route path='/marketplace' element={<Marketplace/>}/>
         <Route path='/contact' element={<Contact/>}/>
         <Route path='/authentication' element={<Authentication/>}/>
-        <Route path='/dashboard' element={<FarmerDashboard/>}/>
-        <Route path='/dashboard' element={<UserDashboard/>}/>
-        <Route path='/dashboard' element={<AdminDashboard/>}/>
+        <Route path='/login' element={<Login/>}/>
+        <Route path='/signup' element={<Signup/>}/>
+        <Route path='/profile' element={<UserProfile/>}/>
       </Routes>
       <Footer/>
     </div>

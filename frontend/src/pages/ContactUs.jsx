@@ -106,11 +106,11 @@ const Contact = () => {
             {/* Right: Info + Map */}
             <div className="col-lg-6 text-center">
               <h4 className="fw-bold text-success mb-4">Reach Us</h4>
-              <p className="mb-2 fw-semibold">Green Fields Office</p>
-              <p className="mb-2">Agro Tech Farm, Kukatpally,</p>
+              <p className="mb-2 fw-semibold">Social Prachar Office</p>
+              <p className="mb-2">Kukatpally Housing Board Colony,</p>
               <p className="mb-2">Hyderabad, Telangana 500072</p>
               <p className="mb-2">📞 +91-9876543210</p>
-              <p className="mb-4">✉️ support@agroservices.com</p>
+              <p className="mb-4">✉️ support@agribuyai.in</p>
 
               <p className="fw-bold mb-3">Find Us on the Map:</p>
               <div className="ratio ratio-4x3 border rounded shadow-sm">
@@ -126,66 +126,6 @@ const Contact = () => {
           </div>
         </div>
       </section>
-
-      {/* ===== Agriculture FAQ Section ===== */}
-      {/* <section className="py-5 bg-white border-top">
-        <div className="container" style={{ maxWidth: "850px" }}>
-          <h2 className="text-center fw-bold mb-5 text-success">
-            Frequently Asked Questions – Agriculture
-          </h2>
-
-          <div className="accordion" id="faqAccordion">
-            {[
-              {
-                q: "What types of crops do you provide support for?",
-                a: "We offer guidance and technical support for a wide range of crops including cereals, pulses, vegetables, and fruits.",
-              },
-              {
-                q: "Do you assist farmers with soil testing?",
-                a: "Yes, we provide soil testing and fertility analysis to help farmers improve crop productivity.",
-              },
-              {
-                q: "How can I get government subsidies for farm equipment?",
-                a: "We guide farmers through the application process for various agricultural subsidy schemes offered by the government.",
-              },
-              {
-                q: "Do you offer training or workshops for farmers?",
-                a: "Absolutely! We conduct regular workshops on sustainable farming, irrigation methods, and modern agricultural technology.",
-              },
-              {
-                q: "Can I purchase organic fertilizers and seeds from you?",
-                a: "Yes, we supply high-quality organic fertilizers, seeds, and crop protection products to support eco-friendly farming.",
-              },
-            ].map((item, index) => (
-              <div className="accordion-item mb-3" key={index}>
-                <h2 className="accordion-header" id={`heading${index}`}>
-                  <button
-                    className={`accordion-button fw-semibold ${
-                      index !== 0 ? "collapsed" : ""
-                    }`}
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target={`#collapse${index}`}
-                    aria-expanded={index === 0 ? "true" : "false"}
-                    aria-controls={`collapse${index}`}
-                  >
-                    {item.q}
-                  </button>
-                </h2>
-                <div
-                  id={`collapse${index}`}
-                  className={`accordion-collapse collapse ${
-                    index === 0 ? "show" : ""
-                  }`}
-                  data-bs-parent="#faqAccordion"
-                >
-                  <div className="accordion-body">{item.a}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section> */}
     </div>
   );
 };
