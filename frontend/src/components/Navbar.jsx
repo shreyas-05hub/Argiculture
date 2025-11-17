@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import logo from "../assets/farm-logo.jpg";
 import { toast } from "react-toastify";
-import './Navbar.css';
+import '../styles/Navbar.css';
 
 const Navbar = () => {
   const navigate = useNavigate();
