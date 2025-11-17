@@ -8,18 +8,49 @@ const Signup = () => {
     email: '',
     password: '',
     role: 'enduser',
+    profileImage: '',
+    acres: '',
+    years: '',
+    cropTypes: '',
+    address: '',
   });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  // Convert uploaded image to Base64
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (err) => reject(err);
+    });
+  };
+
+  const handleChange = async (e) => {
+    const { name, value, files } = e.target;
+
+    if (files && files[0]) {
+      const base64Image = await convertToBase64(files[0]);
+      setFormData({ ...formData, profileImage: base64Image });
+      return;
+    }
+
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // ✅ Store user data locally
-    localStorage.setItem('user', JSON.stringify(formData));
-    alert('Signup successful! Redirecting to login...');
-    navigate('/login');
+
+    // 1️⃣ Load existing users (array)
+    const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
+
+    // 2️⃣ Push new user
+    existingUsers.push(formData);
+
+    // 3️⃣ Save back
+    localStorage.setItem("users", JSON.stringify(existingUsers));
+
+    alert("Signup successful! Redirecting to login...");
+    navigate("/login");
   };
 
   return (
@@ -28,7 +59,10 @@ const Signup = () => {
         <div className="col-md-5">
           <div className="card shadow-lg border-0 p-4">
             <h3 className="text-center mb-4">Create Account</h3>
+
             <form onSubmit={handleSubmit}>
+
+              {/* Username */}
               <div className="mb-3">
                 <label className="form-label">Username</label>
                 <input
@@ -36,11 +70,11 @@ const Signup = () => {
                   name="username"
                   className="form-control"
                   onChange={handleChange}
-                  value={formData.username}
                   required
                 />
               </div>
 
+              {/* Email */}
               <div className="mb-3">
                 <label className="form-label">Email</label>
                 <input
@@ -48,11 +82,11 @@ const Signup = () => {
                   name="email"
                   className="form-control"
                   onChange={handleChange}
-                  value={formData.email}
                   required
                 />
               </div>
 
+              {/* Password */}
               <div className="mb-3">
                 <label className="form-label">Password</label>
                 <input
@@ -60,31 +94,97 @@ const Signup = () => {
                   name="password"
                   className="form-control"
                   onChange={handleChange}
-                  value={formData.password}
                   required
                 />
               </div>
 
+              {/* Role */}
               <div className="mb-3">
                 <label className="form-label">Role</label>
                 <select
                   name="role"
                   className="form-select"
                   onChange={handleChange}
-                  value={formData.role}
                 >
                   <option value="enduser">Customer</option>
                   <option value="farmer">Farmer</option>
-                  {/* <option value="admin">Admin</option> */}
                 </select>
               </div>
+
+              {/* Farmer-only fields */}
+              {formData.role === "farmer" && (
+                <>
+                  {/* Profile Image */}
+                  <div className="mb-3">
+                    <label className="form-label">Profile Picture</label>
+                    <input
+                      type="file"
+                      name="profileImage"
+                      className="form-control"
+                      accept="image/*"
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  {/* Acres */}
+                  <div className="mb-3">
+                    <label className="form-label">Land Size (in Acres)</label>
+                    <input
+                      type="number"
+                      name="acres"
+                      className="form-control"
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  {/* Years */}
+                  <div className="mb-3">
+                    <label className="form-label">Years of Farming Experience</label>
+                    <input
+                      type="number"
+                      name="years"
+                      className="form-control"
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  {/* Crop Types */}
+                  <div className="mb-3">
+                    <label className="form-label">Crop Types (comma-separated)</label>
+                    <input
+                      type="text"
+                      name="cropTypes"
+                      className="form-control"
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  {/* Address */}
+                  <div className="mb-3">
+                    <label className="form-label">Address</label>
+                    <input
+                      type="text"
+                      name="address"
+                      className="form-control"
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </>
+              )}
 
               <button type="submit" className="btn btn-primary w-100">
                 Sign Up
               </button>
+
               <p className="text-center mt-3">
                 Already have an account? <Link to="/login">Login</Link>
               </p>
+
             </form>
           </div>
         </div>

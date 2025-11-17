@@ -7,7 +7,7 @@
 .hero-section {
     background: linear-gradient(rgba(0, 100, 0, 0.6),
             rgba(0, 100, 0, 0.6)),
-        url("https://images.unsplash.com/photo-1606112219348-204d7d8b94ee") center/cover no-repeat;
+        url("https://t3.ftcdn.net/jpg/03/40/70/04/360_F_340700428_AquH6hbzeMOYLQ6g6kfWAMuUvfw60Zd1.jpg") center/cover no-repeat;
     height: 100vh;
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
 }

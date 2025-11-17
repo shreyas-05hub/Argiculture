@@ -1,21 +1,25 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Container, Row, Col, Card, Tab, Nav, Form, Button } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import Cropper from "react-easy-crop";
-import getCroppedImg from "./cropImage"; 
+import getCroppedImg from "./cropImage";
 import "./UserProfile.css";
 
 const UserProfile = () => {
-  const storedUser = JSON.parse(localStorage.getItem("userProfile"));
+  // ---- Load real logged-in user from signup ----
+  const loggedIn = JSON.parse(localStorage.getItem("loggedInUser"));
+  const allUsers = JSON.parse(localStorage.getItem("users")) || [];
 
-  const [user, setUser] = useState(
-    storedUser || {
-      name: "Shreyas Kandekar",
-      phone: "+91 9876543210",
-      address: "",
-      profilePic: null,
-    }
-  );
+  const realUser = allUsers.find((u) => u.email === loggedIn?.email);
+
+  // ---- Initial State ----
+  const [user, setUser] = useState({
+    name: realUser?.username || "Unknown",
+    phone: realUser?.email || "Not Available",
+    address: realUser?.address || "",
+    profilePic: realUser?.profilePic || null,
+    role: realUser?.role || "farmer",
+  });
 
   const [editing, setEditing] = useState({
     name: false,
@@ -23,7 +27,7 @@ const UserProfile = () => {
     address: false,
   });
 
-  // ---- IMAGE CROP STATES ----
+  // IMAGE CROPPING STATES
   const [imageSrc, setImageSrc] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -35,16 +39,23 @@ const UserProfile = () => {
   };
 
   const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
-    saveToLocal({ ...user, [e.target.name]: e.target.value });
+    const updated = { ...user, [e.target.name]: e.target.value };
+    setUser(updated);
+    updateLocalStorage(updated);
   };
 
-  // Save to localStorage
-  const saveToLocal = (data) => {
-    localStorage.setItem("userProfile", JSON.stringify(data));
+  // ---- Update in localStorage.users ----
+  const updateLocalStorage = (updatedUser) => {
+    const updatedUsers = allUsers.map((u) =>
+      u.email === loggedIn.email
+        ? { ...u, username: updatedUser.name, email: updatedUser.phone, address: updatedUser.address, profilePic: updatedUser.profilePic }
+        : u
+    );
+
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
   };
 
-  // When selecting a file
+  // ---- When selecting a new file ----
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -60,62 +71,54 @@ const UserProfile = () => {
     setCroppedAreaPixels(croppedPixels);
   }, []);
 
-  // Save the cropped image
   const saveCroppedImage = async () => {
     try {
       const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
       const updatedUser = { ...user, profilePic: croppedImage };
       setUser(updatedUser);
-      saveToLocal(updatedUser);
+      updateLocalStorage(updatedUser);
       setShowCropper(false);
     } catch (error) {
       console.error(error);
     }
   };
 
-  // Remove Image
   const removeImage = () => {
     const updatedUser = { ...user, profilePic: null };
     setUser(updatedUser);
-    saveToLocal(updatedUser);
+    updateLocalStorage(updatedUser);
   };
 
   return (
     <Container className="profile-container mt-5">
       <Card className="shadow-lg border-0 profile-card p-4">
         <Row>
+
           {/* LEFT SIDE */}
           <Col md={4} className="text-center border-end d-flex flex-column align-items-center justify-content-center">
 
-            {/* Profile Image */}
+            {/* Profile Picture or Avatar */}
             <img
               src={
                 user.profilePic ||
-                "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+                `https://ui-avatars.com/api/?name=${user.name}&background=0D8ABC&color=fff`
               }
               alt="User"
               className="profile-pic mb-3"
             />
 
-            {/* Upload Button */}
             <label className="btn btn-sm btn-primary mt-2">
               Upload Image
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                hidden
-              />
+              <input type="file" accept="image/*" onChange={handleImageUpload} hidden />
             </label>
 
-            {/* Remove Button */}
             {user.profilePic && (
               <button className="btn btn-sm btn-outline-danger mt-2" onClick={removeImage}>
                 <FaTrash /> Remove
               </button>
             )}
 
-            <h5 className="text-muted mt-3">{user.name || "Name not added"}</h5>
+            <h5 className="text-muted mt-3">{user.name}</h5>
           </Col>
 
           {/* RIGHT SIDE */}
@@ -150,23 +153,9 @@ const UserProfile = () => {
                       )}
                     </div>
 
-                    {/* PHONE */}
+                    {/* EMAIL AS PHONE */}
                     <div className="info-item d-flex justify-content-between align-items-center mt-3">
-                      {editing.phone ? (
-                        <Form.Control
-                          type="text"
-                          name="phone"
-                          value={user.phone}
-                          onChange={handleChange}
-                          onBlur={() => handleEditToggle("phone")}
-                          autoFocus
-                        />
-                      ) : (
-                        <h6>
-                          📞 {user.phone}
-                          <FaEdit className="edit-icon" onClick={() => handleEditToggle("phone")} />
-                        </h6>
-                      )}
+                      <h6>📧 {user.phone}</h6>
                     </div>
 
                     {/* ADDRESS */}
@@ -176,7 +165,6 @@ const UserProfile = () => {
                           type="text"
                           name="address"
                           value={user.address}
-                          placeholder="Enter address"
                           onChange={handleChange}
                           onBlur={() => handleEditToggle("address")}
                           autoFocus
@@ -188,6 +176,12 @@ const UserProfile = () => {
                         </h6>
                       )}
                     </div>
+
+                    {/* ROLE (Readonly) */}
+                    <div className="info-item mt-3">
+                      <h6>👤 Role: {user.role}</h6>
+                    </div>
+
                   </div>
                 </Tab.Pane>
               </Tab.Content>
@@ -196,7 +190,7 @@ const UserProfile = () => {
         </Row>
       </Card>
 
-      {/* CROPPER MODAL */}
+      {/* IMAGE CROPPER MODAL */}
       {showCropper && (
         <div className="cropper-modal">
           <div className="cropper-box">
@@ -213,12 +207,8 @@ const UserProfile = () => {
             />
 
             <div className="crop-controls">
-              <Button variant="success" onClick={saveCroppedImage}>
-                Save
-              </Button>
-              <Button variant="danger" onClick={() => setShowCropper(false)}>
-                Cancel
-              </Button>
+              <Button variant="success" onClick={saveCroppedImage}>Save</Button>
+              <Button variant="danger" onClick={() => setShowCropper(false)}>Cancel</Button>
             </div>
           </div>
         </div>

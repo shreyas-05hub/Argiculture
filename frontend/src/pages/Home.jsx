@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/Home.css";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   useEffect(() => {
@@ -30,10 +31,10 @@ const Home = () => {
             <strong>Customers</strong> powered by Artificial Intelligence.
           </p>
           <div className="mt-4">
-            <button className="btn btn-light btn-lg m-2">Join as Farmer 👨‍🌾</button>
-            <button className="btn btn-outline-light btn-lg m-2">
-              Join as Customer 🧑‍💼
-            </button>
+            <Link to="/signup" className="btn btn-light btn-lg m-2">Join as Farmer</Link>
+            <Link to="/signup" className="btn btn-outline-light btn-lg m-2">
+              Join as Customer 
+            </Link>
           </div>
         </div>
       </header>
@@ -183,10 +184,10 @@ const Home = () => {
             Join thousands of farmers and customers using AI to grow profits and
             build trust in agriculture.
           </p>
-          <button className="btn btn-light btn-lg m-2">Join as Farmer</button>
-          <button className="btn btn-outline-light btn-lg m-2">
+          <Link to="/signup" className="btn btn-light btn-lg m-2">Join as Farmer</Link>
+          <Link to="/signup" className="btn btn-outline-light btn-lg m-2">
             Join as Customer
-          </button>
+          </Link>
         </div>
       </section>
     </div>

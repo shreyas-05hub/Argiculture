@@ -13,20 +13,29 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // ✅ Retrieve stored user
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const users = JSON.parse(localStorage.getItem("users")) || [];
 
-    if (
-      storedUser &&
-      storedUser.username === formData.username &&
-      storedUser.password === formData.password
-    ) {
-      // Save login session
-      localStorage.setItem('loggedInUser', JSON.stringify(storedUser));
-      alert('Login successful!');
-      navigate('/');
+    const matchedUser = users.find(
+      (u) =>
+        u.username === formData.username &&
+        u.password === formData.password
+    );
+
+    if (matchedUser) {
+
+      // 🔥 FIX: Convert role to lowercase before saving
+      const loggedIn = {
+        ...matchedUser,
+        role: matchedUser.role.toLowerCase()
+      };
+
+      localStorage.setItem("loggedInUser", JSON.stringify(loggedIn));
+
+      alert("Login successful!");
+
+      navigate("/dashboard");  // all users go to dashboard
     } else {
-      setError('Invalid username or password');
+      setError("Invalid username or password");
     }
   };
 
@@ -66,6 +75,7 @@ const Login = () => {
               <button type="submit" className="btn btn-success w-100">
                 Login
               </button>
+
               <p className="text-center mt-3">
                 Don’t have an account? <Link to="/signup">Sign up</Link>
               </p>

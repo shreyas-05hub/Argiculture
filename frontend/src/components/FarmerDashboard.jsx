@@ -1,10 +1,74 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-const FarmerDashboard=()=> {
+const FarmerDashboard = () => {
   const [showForm, setShowForm] = useState(false);
   const [showPrevious, setShowPrevious] = useState(false);
   const [crops, setCrops] = useState([]);
+
+  const [landModal, setLandModal] = useState(false);
+  const [landDetails, setLandDetails] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+
+  const [landForm, setLandForm] = useState({
+    landImage: "",
+    landSize: "",
+    yearsFarming: "",
+    landAddress: "",
+    cropTypes: "",
+    landDesc: "",
+  });
+
+  // ==========================
+  // ⭐ LOAD FARMER DETAILS
+  // ==========================
+  const [farmer, setFarmer] = useState(null);
+
+  useEffect(() => {
+    const logged = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (logged && logged.role === "farmer") {
+      setFarmer(logged);
+    }
+  }, []);
+
+  // ==========================
+  // ⭐ LOAD LAND DETAILS
+  // ==========================
+  useEffect(() => {
+    const stored = localStorage.getItem("landDetails");
+    if (stored) setLandDetails(JSON.parse(stored));
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+
+    setLandForm({
+      ...landForm,
+      [name]: files ? URL.createObjectURL(files[0]) : value,
+    });
+  };
+
+  const saveLand = () => {
+    localStorage.setItem("landDetails", JSON.stringify(landForm));
+    setLandDetails(landForm);
+    setLandModal(false);
+  };
+
+  const deleteLand = () => {
+    localStorage.removeItem("landDetails");
+    setLandDetails(null);
+    setLandModal(false);
+  };
+
+  const editLand = () => {
+    setLandForm(landDetails);
+    setEditMode(true);
+    setLandModal(true);
+  };
+
+  // ==========================
+  // ⭐ CROP FORM
+  // ==========================
   const [formData, setFormData] = useState({
     type: "",
     name: "",
@@ -14,15 +78,7 @@ const FarmerDashboard=()=> {
     image: null,
   });
 
-  const farmer = {
-    name: "Ravi Kumar",
-    acres: 25,
-    contact: "9876543210",
-    address: "Anantapur, Andhra Pradesh",
-    image: "https://cdn-icons-png.flaticon.com/512/1995/1995574.png",
-  };
-
-  const handleChange = (e) => {
+  const handleCropChange = (e) => {
     const { name, value, files } = e.target;
     setFormData({
       ...formData,
@@ -43,32 +99,151 @@ const FarmerDashboard=()=> {
     setShowForm(false);
   };
 
+  // ==========================
+  // ⛔ Before render
+  // ==========================
+  if (!farmer) {
+    return (
+      <div className="container mt-5">
+        <h4>No farmer details found. Please login again.</h4>
+      </div>
+    );
+  }
+
+  // ==========================
+  // ⭐ AVATAR / PROFILE IMAGE
+  // ==========================
+  const avatar = farmer.profileImage
+    ? farmer.profileImage
+    : `https://ui-avatars.com/api/?name=${farmer.username[0]}&background=0D8ABC&color=fff`;
+
   return (
     <div className="container mt-4">
-      {/* Hero Section */}
+
+      {/* Add Land Floating Button */}
+      {!landDetails && (
+        <button
+          onClick={() => setLandModal(true)}
+          className="btn btn-success"
+          style={{
+            position: "fixed",
+            right: "20px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            zIndex: 999,
+          }}
+        >
+          + Add Land Details
+        </button>
+      )}
+
+      {/* Land Modal */}
+      {landModal && (
+        <div
+          className="modal fade show d-block"
+          style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
+        >
+          <div className="modal-dialog">
+            <div className="modal-content p-3">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  {editMode ? "Edit Land Details" : "Add Land Details"}
+                </h5>
+                <button className="btn-close" onClick={() => setLandModal(false)} />
+              </div>
+
+              <div className="modal-body">
+                <input
+                  type="file"
+                  name="landImage"
+                  className="form-control mb-2"
+                  onChange={handleChange}
+                />
+
+                <input
+                  className="form-control mb-2"
+                  placeholder="Land Size (Acres)"
+                  name="landSize"
+                  value={landForm.landSize}
+                  onChange={handleChange}
+                />
+
+                <input
+                  className="form-control mb-2"
+                  placeholder="Years of Farming"
+                  name="yearsFarming"
+                  value={landForm.yearsFarming}
+                  onChange={handleChange}
+                />
+
+                <input
+                  className="form-control mb-2"
+                  placeholder="Land Address"
+                  name="landAddress"
+                  value={landForm.landAddress}
+                  onChange={handleChange}
+                />
+
+                <input
+                  className="form-control mb-2"
+                  placeholder="Types of Crops"
+                  name="cropTypes"
+                  value={landForm.cropTypes}
+                  onChange={handleChange}
+                />
+
+                <textarea
+                  className="form-control mb-2"
+                  placeholder="Description"
+                  name="landDesc"
+                  value={landForm.landDesc}
+                  onChange={handleChange}
+                ></textarea>
+              </div>
+
+              <div className="modal-footer">
+                <button className="btn btn-success" onClick={saveLand}>
+                  {editMode ? "Update" : "Add"}
+                </button>
+                {editMode && (
+                  <button className="btn btn-danger" onClick={deleteLand}>
+                    Delete
+                  </button>
+                )}
+                <button className="btn btn-secondary" onClick={() => setLandModal(false)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* ⭐ HERO SECTION — unchanged structure */}
       <div className="card p-3 shadow-sm">
         <div className="row align-items-center">
           <div className="col-md-2 text-center">
             <img
-              src={farmer.image}
+              src={avatar}
               alt="farmer"
               className="rounded-circle img-fluid"
-              style={{ width: "100px" }}
+              style={{ width: "100px", height:"100px" }}
             />
           </div>
+
           <div className="col-md-6">
-            <h4>{farmer.name}</h4>
+            <h4>{farmer.username}</h4>
             <p>
-              <strong>Contact:</strong> {farmer.contact} <br />
+              <strong>Email:</strong> {farmer.email} <br />
               <strong>Address:</strong> {farmer.address} <br />
-              <strong>Acres:</strong> {farmer.acres} Acres
+              <strong>Acres:</strong> {farmer.acres || "N/A"} Acres <br />
+              <strong>Experience:</strong> {farmer.years || "N/A"} years
             </p>
           </div>
+
           <div className="col-md-4 text-end">
-            <button
-              className="btn btn-success me-2"
-              onClick={() => setShowForm(true)}
-            >
+            <button className="btn btn-success me-2" onClick={() => setShowForm(true)}>
               + Add Crop
             </button>
             <button
@@ -81,85 +256,103 @@ const FarmerDashboard=()=> {
         </div>
       </div>
 
-      {/* Add Crop Modal */}
-      {showForm && (
-        <div
-          className="modal fade show d-block"
-          tabIndex="-1"
-          style={{ backgroundColor: "rgba(0,0,0,0.4)" }}
-        >
-          <div className="modal-dialog">
-            <div className="modal-content p-3">
-              <div className="modal-header">
-                <h5 className="modal-title">Add Crop to Marketplace</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowForm(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="form-group mb-2">
-                  <label>Crop Type</label>
-                  <select
-                    className="form-control"
-                    name="type"
-                    value={formData.type}
-                    onChange={handleChange}
-                  >
-                    <option value="">Select Type</option>
-                    <option value="Millets">Millets</option>
-                    <option value="Grains">Grains</option>
-                    <option value="Vegetables">Vegetables</option>
-                    <option value="Fruits">Fruits</option>
-                  </select>
-                </div>
-                <input
-                  className="form-control mb-2"
-                  placeholder="Crop Name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                />
-                <input
-                  className="form-control mb-2"
-                  placeholder="Quantity (kg)"
-                  name="quantity"
-                  value={formData.quantity}
-                  onChange={handleChange}
-                />
-                <input
-                  className="form-control mb-2"
-                  placeholder="Expected Amount (₹)"
-                  name="amount"
-                  value={formData.amount}
-                  onChange={handleChange}
-                />
-                <input
-                  type="file"
-                  className="form-control mb-2"
-                  name="image"
-                  onChange={handleChange}
-                />
-                <textarea
-                  className="form-control mb-2"
-                  placeholder="Description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                ></textarea>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-success" onClick={handleAdd}>
-                  Add
-                </button>
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => setShowForm(false)}
-                >
-                  Cancel
-                </button>
-              </div>
+            {/* ADD CROP FORM */}
+{showForm && (
+  <div className="card p-3 mt-4 shadow-sm">
+    <h5>Add New Crop</h5>
+
+    <input
+      type="file"
+      name="image"
+      className="form-control mb-2"
+      onChange={handleCropChange}
+    />
+
+    <input
+      type="text"
+      name="name"
+      placeholder="Crop Name"
+      className="form-control mb-2"
+      value={formData.name}
+      onChange={handleCropChange}
+    />
+
+    <input
+      type="text"
+      name="type"
+      placeholder="Crop Type"
+      className="form-control mb-2"
+      value={formData.type}
+      onChange={handleCropChange}
+    />
+
+    <input
+      type="number"
+      name="quantity"
+      placeholder="Quantity (kg)"
+      className="form-control mb-2"
+      value={formData.quantity}
+      onChange={handleCropChange}
+    />
+
+    <input
+      type="number"
+      name="amount"
+      placeholder="Price (₹)"
+      className="form-control mb-2"
+      value={formData.amount}
+      onChange={handleCropChange}
+    />
+
+    <textarea
+      name="description"
+      placeholder="Description"
+      className="form-control mb-2"
+      value={formData.description}
+      onChange={handleCropChange}
+    ></textarea>
+
+    <div className="text-end">
+      <button className="btn btn-success me-2" onClick={handleAdd}>
+        Add Crop
+      </button>
+      <button className="btn btn-secondary" onClick={() => setShowForm(false)}>
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+
+      {/* LAND DETAILS SECTION */}
+      {landDetails && (
+        <div className="card shadow-sm p-3 mt-3">
+          <div className="row align-items-center">
+            <div className="col-md-4 text-center">
+              <img
+                src={landDetails.landImage}
+                className="img-fluid rounded"
+                style={{ height: "200px", width: "100%", objectFit: "cover" }}
+              />
+            </div>
+
+            <div className="col-md-8">
+              <h4>Land Details</h4>
+              <p>
+                <strong>Land Size:</strong> {landDetails.landSize} Acres <br />
+                <strong>Years of Farming:</strong> {landDetails.yearsFarming} <br />
+                <strong>Address:</strong> {landDetails.landAddress} <br />
+                <strong>Crops Grown:</strong> {landDetails.cropTypes}
+              </p>
+
+              <p>{landDetails.landDesc}</p>
+
+              <button className="btn btn-warning me-2" onClick={editLand}>
+                Edit
+              </button>
+
+              <button className="btn btn-danger" onClick={deleteLand}>
+                Delete
+              </button>
             </div>
           </div>
         </div>
@@ -176,7 +369,7 @@ const FarmerDashboard=()=> {
         <div className="col-md-4">
           <div className="card text-center shadow-sm p-3 m-2">
             <h5>Total Acres</h5>
-            <p>{farmer.acres} Acres</p>
+            <p>{farmer.acres || "N/A"} Acres</p>
           </div>
         </div>
         <div className="col-md-4">
@@ -220,7 +413,9 @@ const FarmerDashboard=()=> {
           ))}
         </div>
       </div>
+
     </div>
   );
-}
+};
+
 export default FarmerDashboard;
