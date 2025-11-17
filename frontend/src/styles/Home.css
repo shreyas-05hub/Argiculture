@@ -1,6 +1,10 @@
 .homepage {
     font-family: "Poppins", sans-serif;
     scroll-behavior: smooth;
+
+    /* FIX: remove bottom spacing causing gap before footer */
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
 }
 
 /* Hero Section */
@@ -28,6 +32,15 @@
     transition: 0.3s;
 }
 
+.lead{
+    font-size: 1.5rem;
+    color: #fcfbfb;
+    font-weight: bolder;
+}
+
+/* .company-name{
+    color: #48f759;
+} */
 /* Simple fade/slide/zoom animations */
 .animate {
     opacity: 0;
@@ -62,4 +75,16 @@
 .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 20px rgba(0, 128, 0, 0.15);
+}
+
+/* FIX: Last section shouldn't create blank space above footer */
+.homepage > section:last-child {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Extra safety: remove global body bottom spacing */
+body {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
 }
