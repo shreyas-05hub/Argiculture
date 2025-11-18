@@ -53,7 +53,7 @@
 }
 
 /* ---------------- HERO CONTENT ---------------- */
-.hero-content {
+/* .hero-content {
     max-width: 750px;
     padding: 20px;
     backdrop-filter: blur(6px);
@@ -61,7 +61,7 @@
     border-radius: 20px;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
     transform: translateY(30px);
-}
+} */
 
 /* Fix lead text inside hero-content */
 .hero-content .lead {

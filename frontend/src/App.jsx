@@ -21,6 +21,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import AdminDashboard from './components/AdminDashboard'
 import FarmerDashboard from './components/FarmerDashboard'
 // import UserDashboard from './components/UserDashboard'
+import "./styles/style.css"
 
 const App = () => {
 

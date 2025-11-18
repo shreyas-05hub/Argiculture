@@ -200,10 +200,10 @@ export default function AboutUs() {
                     {stats.map((s) => (
                       <div className="col-6" key={s.label}>
                         <div className="p-3 bg-success bg-opacity-10 rounded text-center shadow-sm">
-                          <h5 className="fw-bold text-success mb-0">
+                          <h5 className="fw-bold text-white mb-0">
                             {s.current.toLocaleString()}
                           </h5>
-                          <small className="text-muted">{s.label}</small>
+                          <small className="text-muted fw-bold">{s.label}</small>
                         </div>
                       </div>
                     ))}
