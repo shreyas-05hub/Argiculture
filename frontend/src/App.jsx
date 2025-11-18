@@ -21,6 +21,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import AdminDashboard from './components/AdminDashboard'
 import FarmerDashboard from './components/FarmerDashboard'
 // import UserDashboard from './components/UserDashboard'
+import Orders from './pages/Orders';
 import "./styles/style.css"
 
 const App = () => {
@@ -76,6 +77,7 @@ const App = () => {
               <AdminDashboard />
             </ProtectedRoute>}/>        
         <Route path='/profile' element={<UserProfile/>}/>
+        <Route path='/orders' element={<Orders/>}/>
         <Route path='/usermanagement' element={<UserManagement/>}/>
         <Route path='/settings' element={<Settings/>}/>
         <Route path='/reports' element={<Reports/>}/>
