@@ -1,18 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { toast } from "react-toastify";
-import '../styles/Navbar.css';
+import "../styles/Navbar.css";
 
 const Navbar = () => {
   const navigate = useNavigate();
 
-<<<<<<< HEAD
+  // Load user once
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const logo = "/assets/farm-logo.jpg";
-
 
   // Load logged-in user during first render
   useEffect(() => {
@@ -20,12 +19,7 @@ const Navbar = () => {
     setUser(storedUser);
   }, []);
 
-=======
-  const user = JSON.parse(localStorage.getItem("loggedInUser"));
->>>>>>> 27d26d4331eba200b24a9fe0fe48a1aa674184c4
   const role = user?.role || "guest";
-
-  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem("loggedInUser");
@@ -40,7 +34,6 @@ const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm sticky-top">
       <div className="container">
-
         {/* Logo */}
         <Link className="navbar-brand fw-bold text-success" to="/">
           <img
@@ -59,8 +52,6 @@ const Navbar = () => {
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
@@ -71,8 +62,6 @@ const Navbar = () => {
           id="navbarNav"
         >
           <ul className="navbar-nav nav-underline-animation">
-
-            {/* Always visible */}
             <li className="nav-item">
               <NavLink className="nav-link animated-link" to="/">
                 Home
@@ -103,7 +92,10 @@ const Navbar = () => {
 
             {role === "admin" && (
               <li className="nav-item">
-                <NavLink className="nav-link animated-link" to="/admin-dashboard">
+                <NavLink
+                  className="nav-link animated-link"
+                  to="/admin-dashboard"
+                >
                   Admin Dashboard
                 </NavLink>
               </li>
@@ -117,14 +109,37 @@ const Navbar = () => {
           </ul>
         </div>
 
-        {/* Right section */}
-        {/* <div className="d-flex align-items-center">
-
-          {!user ? (
+        {/* RIGHT SIDE USER SECTION */}
+        <div className="d-flex align-items-center">
+          {/* GUEST → Login Button */}
+          {!user && (
             <Link className="btn btn-success px-3 py-1" to="/authentication">
               Login
             </Link>
-          ) : (
+          )}
+
+          {/* ADMIN → Show username + logout icon */}
+          {user && role === "admin" && (
+            <div className="d-flex align-items-center gap-3">
+              {/* Admin Username */}
+              <Link to="/profile" className="fw-bold text-dark">
+                👤 {user.username}
+              </Link>
+
+              {/* Logout Button with Icon */}
+              <button
+                onClick={handleLogout}
+                className="btn btn-danger d-flex align-items-center gap-2 px-3 py-1"
+                style={{ borderRadius: "8px" }}
+              >
+                <i className="bi bi-box-arrow-right fs-5"></i>
+                Logout
+              </button>
+            </div>
+          )}
+
+          {/* FARMER + ENDUSER → DROPDOWN */}
+          {user && (role === "farmer" || role === "enduser") && (
             <div className="dropdown-container">
               <div
                 className="user-icon"
@@ -154,66 +169,7 @@ const Navbar = () => {
               )}
             </div>
           )}
-        </div> */}
-        {/* Right side section */}
-<div className="d-flex align-items-center">
-
-  {/* GUEST → show Login */}
-  {!user && (
-    <Link className="btn btn-success px-3 py-1" to="/authentication">
-      Login
-    </Link>
-  )}
-
-  {/* ADMIN → NO DROPDOWN → show Profile + Logout icon */}
-  {user && role === "admin" && (
-    <div className="d-flex align-items-center gap-3">
-      <Link to="/profile" className="fw-bold text-dark">
-        👤 {user.username}
-      </Link>
-
-      <i
-        className="bi bi-box-arrow-right fs-4 text-danger"
-        style={{ cursor: "pointer" }}
-        onClick={handleLogout}
-      ></i>
-    </div>
-  )}
-
-  {/* FARMER + ENDUSER → SHOW DROPDOWN */}
-  {user && (role === "farmer" || role === "enduser") && (
-    <div className="dropdown-container">
-      <div
-        className="user-icon"
-        onClick={() => setDropdownOpen(!dropdownOpen)}
-      >
-        👤 {user.username}
-      </div>
-
-      {dropdownOpen && (
-        <div className="dropdown-menu-custom">
-          <Link to="/profile" className="dropdown-item-custom">
-            Profile
-          </Link>
-
-          <Link to="/orders" className="dropdown-item-custom">
-            Orders
-          </Link>
-
-          <button
-            className="dropdown-item-custom text-danger"
-            onClick={handleLogout}
-          >
-            <i className="bi bi-box-arrow-right me-2"></i>
-            Logout
-          </button>
         </div>
-      )}
-    </div>
-  )}
-
-</div>
-
       </div>
     </nav>
   );
