@@ -20,7 +20,7 @@ import Reports from './pages/Reports'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminDashboard from './components/AdminDashboard'
 import FarmerDashboard from './components/FarmerDashboard'
-import UserDashboard from './components/UserDashboard'
+// import UserDashboard from './components/UserDashboard'
 
 const App = () => {
 
@@ -66,10 +66,10 @@ const App = () => {
             <ProtectedRoute role="farmer">
               <FarmerDashboard />
             </ProtectedRoute>}/>
-        <Route path="/user-dashboard" element={
+        {/* <Route path="/user-dashboard" element={
             <ProtectedRoute role="enduser">
               <UserDashboard />
-            </ProtectedRoute>}/>
+            </ProtectedRoute>}/> */}
         <Route path="/admin-dashboard" element={
             <ProtectedRoute role="admin">
               <AdminDashboard />

@@ -90,7 +90,7 @@ const Navbar = () => {
 
             {role === "admin" && (
               <li className="nav-item">
-                <NavLink className="nav-link animated-link" to="/admindash">
+                <NavLink className="nav-link animated-link" to="/admin-dashboard">
                   Admin Dashboard
                 </NavLink>
               </li>
@@ -105,7 +105,7 @@ const Navbar = () => {
         </div>
 
         {/* Right section */}
-        <div className="d-flex align-items-center">
+        {/* <div className="d-flex align-items-center">
 
           {!user ? (
             <Link className="btn btn-success px-3 py-1" to="/authentication">
@@ -141,7 +141,65 @@ const Navbar = () => {
               )}
             </div>
           )}
+        </div> */}
+        {/* Right side section */}
+<div className="d-flex align-items-center">
+
+  {/* GUEST → show Login */}
+  {!user && (
+    <Link className="btn btn-success px-3 py-1" to="/authentication">
+      Login
+    </Link>
+  )}
+
+  {/* ADMIN → NO DROPDOWN → show Profile + Logout icon */}
+  {user && role === "admin" && (
+    <div className="d-flex align-items-center gap-3">
+      <Link to="/profile" className="fw-bold text-dark">
+        👤 {user.username}
+      </Link>
+
+      <i
+        className="bi bi-box-arrow-right fs-4 text-danger"
+        style={{ cursor: "pointer" }}
+        onClick={handleLogout}
+      ></i>
+    </div>
+  )}
+
+  {/* FARMER + ENDUSER → SHOW DROPDOWN */}
+  {user && (role === "farmer" || role === "enduser") && (
+    <div className="dropdown-container">
+      <div
+        className="user-icon"
+        onClick={() => setDropdownOpen(!dropdownOpen)}
+      >
+        👤 {user.username}
+      </div>
+
+      {dropdownOpen && (
+        <div className="dropdown-menu-custom">
+          <Link to="/profile" className="dropdown-item-custom">
+            Profile
+          </Link>
+
+          <Link to="/orders" className="dropdown-item-custom">
+            Orders
+          </Link>
+
+          <button
+            className="dropdown-item-custom text-danger"
+            onClick={handleLogout}
+          >
+            <i className="bi bi-box-arrow-right me-2"></i>
+            Logout
+          </button>
         </div>
+      )}
+    </div>
+  )}
+
+</div>
 
       </div>
     </nav>
