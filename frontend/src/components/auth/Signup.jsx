@@ -173,8 +173,13 @@ const Signup = () => {
                 </>
               )}
 
+<<<<<<< HEAD
               <button type="submit" className="btn btn-primary w-100 signup-btn">
                 Sign Up
+=======
+              <button type="submit" className="btn btn-success w-100">
+                Sign-Up
+>>>>>>> 27d26d4331eba200b24a9fe0fe48a1aa674184c4
               </button>
 
               <p className="text-center mt-3 ">

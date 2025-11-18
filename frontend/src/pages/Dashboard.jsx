@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FarmerDashboard from "../components/FarmerDashboard";
-import UserDashboard from "../components/UserDashboard";
 import AdminDashboard from "../components/AdminDashboard";
+// import UserDashboard from "../components/UserDashboard";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState(null);
 
   useEffect(() => {
-    // Load logged-in user
     const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
+    // If user not logged in → redirect to Authentication page
     if (!loggedUser) {
-      navigate("/login");
+      navigate("/authentication");
       return;
     }
 
-    // Correct role
     const userRole = loggedUser.role?.toLowerCase();
     setRole(userRole);
   }, [navigate]);
@@ -28,10 +27,14 @@ const Dashboard = () => {
 
   // Role based dashboards
   if (role === "farmer") return <FarmerDashboard />;
-  if (role === "enduser") return <UserDashboard />;
+  // if (role === "enduser") return <UserDashboard />;
   if (role === "admin") return <AdminDashboard />;
 
-  return <h2>No dashboard available</h2>;
+  return (
+    <h2 className="text-center mt-4 text-danger">
+      No dashboard available for your role.
+    </h2>
+  );
 };
 
 export default Dashboard;

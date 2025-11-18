@@ -2,7 +2,14 @@
 .homepage {
     font-family: "Poppins", sans-serif;
     scroll-behavior: smooth;
+<<<<<<< HEAD
     background: #81e88d;
+=======
+
+    /* FIX: remove bottom spacing causing gap before footer */
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+>>>>>>> 27d26d4331eba200b24a9fe0fe48a1aa674184c4
 }
 
 /* ---------------- HERO SECTION ---------------- */
@@ -37,6 +44,7 @@
     right: 10%;
 }
 
+<<<<<<< HEAD
 .hero-section::before {
     top: 15%;
     left: 10%;
@@ -61,6 +69,19 @@
     border-radius: 20px;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
     transform: translateY(30px);
+=======
+.lead{
+    font-size: 1.5rem;
+    color: #fcfbfb;
+    font-weight: bolder;
+}
+
+/* .company-name{
+    color: #48f759;
+} */
+/* Simple fade/slide/zoom animations */
+.animate {
+>>>>>>> 27d26d4331eba200b24a9fe0fe48a1aa674184c4
     opacity: 0;
     transition: 1.3s ease;
 }
@@ -108,6 +129,7 @@ h5 {
     font-weight: 700;
 }
 
+<<<<<<< HEAD
 /* Section spacing */
 section {
     padding-top: 80px !important;
@@ -141,3 +163,22 @@ a:hover {
     text-decoration: none;
     filter: brightness(1.1);
 }
+=======
+.workflow-step:hover,
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 128, 0, 0.15);
+}
+
+/* FIX: Last section shouldn't create blank space above footer */
+.homepage > section:last-child {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Extra safety: remove global body bottom spacing */
+body {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+>>>>>>> 27d26d4331eba200b24a9fe0fe48a1aa674184c4

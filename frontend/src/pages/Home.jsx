@@ -25,7 +25,7 @@ const Home = () => {
       {/* Hero Section */}
       <header className="hero-section text-center text-white d-flex align-items-center justify-content-center animate">
         <div className="hero-content">
-          <h1 className="fw-bold display-3">AgriBuy AI</h1>
+          {/* <h1 className="fw-bold display-3"><span className="">AgriBuy</span><span className="text-primary">AI</span></h1> */}
           <p className="lead">
             The Intelligent Marketplace for <strong>Farmers</strong> &{" "}
             <strong>Customers</strong> powered by Artificial Intelligence.
@@ -41,7 +41,7 @@ const Home = () => {
 
       {/* About Section */}
       <section id="about" className="py-5 bg-light animate">
-        <div className="container text-center">
+        <div className="container text-center ">
           <h2 className="fw-bold mb-4 text-success">About AgriBuy AI</h2>
           <p className="text-muted fs-5">
             AgriBuy AI is an AI-powered digital marketplace that connects farmers
