@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import './Login.css';   // <-- Add this line to import CSS
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,29 +23,26 @@ const Login = () => {
     );
 
     if (matchedUser) {
-
-      // 🔥 FIX: Convert role to lowercase before saving
       const loggedIn = {
         ...matchedUser,
         role: matchedUser.role.toLowerCase()
       };
 
       localStorage.setItem("loggedInUser", JSON.stringify(loggedIn));
-
       alert("Login successful!");
-
-      navigate("/dashboard");  // all users go to dashboard
+      navigate("/dashboard");
     } else {
       setError("Invalid username or password");
     }
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
+    <div className="login-bg">
+      <div className="container d-flex justify-content-center align-items-center vh-100 fade-in">
         <div className="col-md-5">
-          <div className="card shadow-lg border-0 p-4">
-            <h3 className="text-center mb-4">Login</h3>
+          <div className="login-card shadow-lg p-4">
+            <h3 className="text-center mb-4 animate-slide">Login</h3>
+
             {error && <div className="alert alert-danger">{error}</div>}
 
             <form onSubmit={handleSubmit}>
@@ -72,12 +70,12 @@ const Login = () => {
                 />
               </div>
 
-              <button type="submit" className="btn btn-success w-100">
+              <button type="submit" className="btn btn-success w-100 login-btn">
                 Login
               </button>
 
-              <p className="text-center mt-3">
-                Don’t have an account? <Link to="/signup">Sign up</Link>
+              <p className="text-center mt-3 text-white">
+                Don’t have an account? <Link to="/signup" className="signup-link">Sign up</Link>
               </p>
             </form>
           </div>

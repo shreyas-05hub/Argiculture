@@ -177,15 +177,15 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-5 text-center bg-success text-white animate">
+      <section className="py-5 text-center bg-light  animate">
         <div className="container">
           <h2 className="fw-bold mb-3">Start Trading Smarter with AgriBuy AI</h2>
           <p className="mb-4">
             Join thousands of farmers and customers using AI to grow profits and
             build trust in agriculture.
           </p>
-          <Link to="/signup" className="btn btn-light btn-lg m-2">Join as Farmer</Link>
-          <Link to="/signup" className="btn btn-outline-light btn-lg m-2">
+          <Link to="/signup" className="btn btn-dark btn-lg m-2">Join as Farmer</Link>
+          <Link to="/signup" className="btn btn-outline-dark btn-lg m-2">
             Join as Customer
           </Link>
         </div>

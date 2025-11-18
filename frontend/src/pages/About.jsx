@@ -78,7 +78,7 @@ export default function AboutUs() {
       img: "https://images.unsplash.com/photo-1603415526960-f7e0328a2c3b?auto=format&fit=crop&w=500&q=80",
     },
     {
-      name: "Rajhitha",
+      name: "Rajitha",
       role: "Data Science",
       bio: "Designs predictive models for market intelligence and price optimization.",
       img: "https://images.unsplash.com/photo-1603415526960-f7e0328a2c3b?auto=format&fit=crop&w=500&q=80",

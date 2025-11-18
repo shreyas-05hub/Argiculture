@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import './Signup.css';  // <-- Add this
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -15,7 +16,6 @@ const Signup = () => {
     address: '',
   });
 
-  // Convert uploaded image to Base64
   const convertToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -40,13 +40,8 @@ const Signup = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // 1️⃣ Load existing users (array)
     const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
-
-    // 2️⃣ Push new user
     existingUsers.push(formData);
-
-    // 3️⃣ Save back
     localStorage.setItem("users", JSON.stringify(existingUsers));
 
     alert("Signup successful! Redirecting to login...");
@@ -54,14 +49,15 @@ const Signup = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-5">
-          <div className="card shadow-lg border-0 p-4">
-            <h3 className="text-center mb-4">Create Account</h3>
+    <div className="signup-bg">
+      <div className="container d-flex justify-content-center align-items-center  fade-in">
+        <div className="col-md-6 col-lg-5">
+          <div className="signup-card shadow-lg p-4">
+
+            <h3 className="text-center mb-4 animate-slide">Create Account</h3>
 
             <form onSubmit={handleSubmit}>
-
+              
               {/* Username */}
               <div className="mb-3">
                 <label className="form-label">Username</label>
@@ -141,7 +137,7 @@ const Signup = () => {
 
                   {/* Years */}
                   <div className="mb-3">
-                    <label className="form-label">Years of Farming Experience</label>
+                    <label className="form-label">Farming Experience (Years)</label>
                     <input
                       type="number"
                       name="years"
@@ -177,12 +173,12 @@ const Signup = () => {
                 </>
               )}
 
-              <button type="submit" className="btn btn-primary w-100">
+              <button type="submit" className="btn btn-primary w-100 signup-btn">
                 Sign Up
               </button>
 
-              <p className="text-center mt-3">
-                Already have an account? <Link to="/login">Login</Link>
+              <p className="text-center mt-3 ">
+                Already have an account? <Link to="/login" className="login-link">Login</Link>
               </p>
 
             </form>

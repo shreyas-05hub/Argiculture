@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import logo from "../assets/farm-logo.jpg";
 import { toast } from "react-toastify";
 import '../styles/Navbar.css';
 
@@ -11,6 +10,8 @@ const Navbar = () => {
 
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const logo = "/assets/farm-logo.jpg";
+
 
   // Load logged-in user during first render
   useEffect(() => {
