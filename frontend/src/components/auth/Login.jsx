@@ -35,7 +35,12 @@ const Login = () => {
         role: matchedUser.role.toLowerCase(),
       };
 
+      // Save logged in user
       localStorage.setItem("loggedInUser", JSON.stringify(loggedIn));
+
+      // 🔥 Very important — Notify Navbar to update
+      window.dispatchEvent(new Event("storageUpdated"));
+
       alert("Login successful!");
 
       // Redirect based on role
