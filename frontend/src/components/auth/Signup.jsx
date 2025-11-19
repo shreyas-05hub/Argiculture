@@ -1,70 +1,96 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import './Signup.css';  // <-- Add this
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import "./Signup.css";
 
 const Signup = () => {
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    role: 'enduser',
-    profileImage: '',
-    acres: '',
-    years: '',
-    cropTypes: '',
-    address: '',
+    first_name: "",
+    last_name: "",
+    mobile_no: "",
+    email: "",
+    password: "",
+    role: "enduser",
   });
 
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (err) => reject(err);
-    });
-  };
+  const [error, setError] = useState("");
 
-  const handleChange = async (e) => {
-    const { name, value, files } = e.target;
-
-    if (files && files[0]) {
-      const base64Image = await convertToBase64(files[0]);
-      setFormData({ ...formData, profileImage: base64Image });
-      return;
-    }
-
+  // Handle input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  // Submit form — Sends data to Django
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
-    existingUsers.push(formData);
-    localStorage.setItem("users", JSON.stringify(existingUsers));
+    try {
+      const res = await fetch("http://127.0.0.1:8000/signup/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    alert("Signup successful! Redirecting to login...");
-    navigate("/login");
+      const data = await res.json();
+
+      if (res.status === 201) {
+        alert("Signup successful!");
+        navigate("/login");
+      } else {
+        setError(data.error || "Signup failed.");
+      }
+    } catch (err) {
+      setError("Server error. Please try again.");
+    }
   };
 
   return (
     <div className="signup-bg">
-      <div className="container d-flex justify-content-center align-items-center  fade-in">
+      <div className="container d-flex justify-content-center align-items-center fade-in">
         <div className="col-md-6 col-lg-5">
           <div className="signup-card shadow-lg p-4">
-
             <h3 className="text-center mb-4 animate-slide">Create Account</h3>
 
+            {error && <p className="text-danger text-center">{error}</p>}
+
             <form onSubmit={handleSubmit}>
-              
-              {/* Username */}
+
+              {/* First Name */}
               <div className="mb-3">
-                <label className="form-label">Username</label>
+                <label className="form-label">First Name</label>
                 <input
                   type="text"
-                  name="username"
+                  name="first_name"
                   className="form-control"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              {/* Last Name */}
+              <div className="mb-3">
+                <label className="form-label">Last Name</label>
+                <input
+                  type="text"
+                  name="last_name"
+                  className="form-control"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              {/* Mobile Number */}
+              <div className="mb-3">
+                <label className="form-label">Mobile Number</label>
+                <input
+                  type="tel"
+                  name="mobile_no"
+                  className="form-control"
+                  value={formData.mobile_no}
                   onChange={handleChange}
                   required
                 />
@@ -77,6 +103,7 @@ const Signup = () => {
                   type="email"
                   name="email"
                   className="form-control"
+                  value={formData.email}
                   onChange={handleChange}
                   required
                 />
@@ -89,6 +116,7 @@ const Signup = () => {
                   type="password"
                   name="password"
                   className="form-control"
+                  value={formData.password}
                   onChange={handleChange}
                   required
                 />
@@ -96,10 +124,11 @@ const Signup = () => {
 
               {/* Role */}
               <div className="mb-3">
-                <label className="form-label">Role</label>
+                <label className="form-label">Sign Up As</label>
                 <select
                   name="role"
                   className="form-select"
+                  value={formData.role}
                   onChange={handleChange}
                 >
                   <option value="enduser">Customer</option>
@@ -107,80 +136,16 @@ const Signup = () => {
                 </select>
               </div>
 
-              {/* Farmer-only fields */}
-              {formData.role === "farmer" && (
-                <>
-                  {/* Profile Image */}
-                  <div className="mb-3">
-                    <label className="form-label">Profile Picture</label>
-                    <input
-                      type="file"
-                      name="profileImage"
-                      className="form-control"
-                      accept="image/*"
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  {/* Acres */}
-                  <div className="mb-3">
-                    <label className="form-label">Land Size (in Acres)</label>
-                    <input
-                      type="number"
-                      name="acres"
-                      className="form-control"
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  {/* Years */}
-                  <div className="mb-3">
-                    <label className="form-label">Farming Experience (Years)</label>
-                    <input
-                      type="number"
-                      name="years"
-                      className="form-control"
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  {/* Crop Types */}
-                  <div className="mb-3">
-                    <label className="form-label">Crop Types (comma-separated)</label>
-                    <input
-                      type="text"
-                      name="cropTypes"
-                      className="form-control"
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  {/* Address */}
-                  <div className="mb-3">
-                    <label className="form-label">Address</label>
-                    <input
-                      type="text"
-                      name="address"
-                      className="form-control"
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </>
-              )}
-
               <button type="submit" className="btn btn-success w-100">
                 Sign-Up
               </button>
 
-              <p className="text-center mt-3 ">
-                Already have an account? <Link to="/login" className="login-link">Login</Link>
+              <p className="text-center mt-3">
+                Already have an account?{" "}
+                <Link to="/login" className="login-link">
+                  Login
+                </Link>
               </p>
-
             </form>
           </div>
         </div>

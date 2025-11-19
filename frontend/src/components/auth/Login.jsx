@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import './Login.css';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import "./Login.css";
 
 const Login = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    username: "",
+    email: "",
     password: "",
   });
 
@@ -18,43 +18,44 @@ const Login = () => {
   };
 
   // Handle Login Submit
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+    try {
+      const response = await fetch("http://127.0.0.1:8000/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-    const matchedUser = users.find(
-      (u) =>
-        u.username === formData.username &&
-        u.password === formData.password
-    );
+      const data = await response.json();
 
-    if (matchedUser) {
-      const loggedIn = {
-        ...matchedUser,
-        role: matchedUser.role.toLowerCase(),
-      };
+      if (!response.ok) {
+        setError(data.error || "Invalid email or password");
+        return;
+      }
 
-      // Save logged in user
-      localStorage.setItem("loggedInUser", JSON.stringify(loggedIn));
+      // Save user data
+      localStorage.setItem("loggedInUser", JSON.stringify(data));
 
-      // 🔥 Very important — Notify Navbar to update
+      // Notify Navbar
       window.dispatchEvent(new Event("storageUpdated"));
 
       alert("Login successful!");
 
-      // Redirect based on role
-      if (loggedIn.role === "admin") {
+      // Redirect by role
+      if (data.role === "admin") {
         navigate("/admin-dashboard");
-      } else if (loggedIn.role === "farmer") {
+      } else if (data.role === "farmer") {
         navigate("/dashboard");
-      } else if (loggedIn.role === "enduser") {
-        navigate("/marketplace");
       } else {
-        navigate("/");
+        navigate("/marketplace");
       }
-    } else {
-      setError("Invalid username or password");
+    } catch (error) {
+      setError("Server error. Please try again.");
     }
   };
 
@@ -69,14 +70,14 @@ const Login = () => {
 
             <form onSubmit={handleSubmit}>
 
-              {/* Username */}
+              {/* Email */}
               <div className="mb-3">
-                <label className="form-label">Username</label>
+                <label className="form-label">Email</label>
                 <input
-                  type="text"
-                  name="username"
+                  type="email"
+                  name="email"
                   className="form-control"
-                  value={formData.username}
+                  value={formData.email}
                   onChange={handleChange}
                   required
                 />
@@ -95,12 +96,10 @@ const Login = () => {
                 />
               </div>
 
-              {/* Login Button */}
               <button type="submit" className="btn btn-success w-100 login-btn">
                 Login
               </button>
 
-              {/* Signup Link */}
               <p className="text-center mt-3 text-white">
                 Don’t have an account?{" "}
                 <Link to="/signup" className="signup-link">
