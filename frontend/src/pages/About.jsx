@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+
 export default function AboutUs() {
   const targetStats = [
     { label: "Farmers Connected", value: 50000 },
@@ -104,46 +105,33 @@ export default function AboutUs() {
   ];
 
   return (
-    <main className="bg-light text-dark">
+    <main className=" bg-light text-dark">
       {/* Hero Section */}
-      <section className="py-5 bg-success text-white">
-        <div className="container">
-          <div className="row align-items-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="col-lg-6"
+      <section className="first-section p-5 bg-success text-white align-item-center">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="col-lg-12"
+        >
+          <h1 className="fw-bold display-4">Empowering Farmers with AI</h1>
+          <p className="mt-3 fs-5 fw-bold">
+            AgriBuy AI bridges farmers, traders, and industries using deep
+            learning to ensure fair trade, crop intelligence, and profitable
+            agriculture.
+          </p>
+          <div className="mt-4 d-flex gap-3">
+            <a
+              href="#features"
+              className="btn btn-light text-success fw-semibold px-4 rounded-pill"
             >
-              <h1 className="fw-bold display-4">Empowering Farmers with AI</h1>
-              <p className="mt-3 fs-5">
-                AgriBuy AI bridges farmers, traders, and industries using deep
-                learning to ensure fair trade, crop intelligence, and profitable
-                agriculture.
-              </p>
-              <div className="mt-4 d-flex gap-3">
-                <a href="#features" className="btn btn-light text-success fw-semibold px-4 rounded-pill">
-                  Explore Features
-                </a>
-                <a href="#team" className="btn btn-outline-light px-4 rounded-pill">
-                  Meet Our Team
-                </a>
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1 }}
-              className="col-lg-6 text-center mt-4 mt-lg-0"
-            >
-              <img
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhTEeFElMjyriI4kl7RjRv6XXfELjpIWhldw&s         "
-                alt="Farm AI"
-                className="img-fluid rounded-4 shadow-lg"
-              />
-            </motion.div>
+              Explore Features
+            </a>
+            <a href="#team" className="btn btn-outline-light px-4 rounded-pill">
+              Meet Our Team
+            </a>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Features Section */}
@@ -177,7 +165,7 @@ export default function AboutUs() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-5 bg-white">
+      <section className="mv-section py-5">
         <div className="container">
           <div className="row align-items-center g-5">
             <div className="col-lg-6">
@@ -203,7 +191,9 @@ export default function AboutUs() {
                           <h5 className="fw-bold text-white mb-0">
                             {s.current.toLocaleString()}
                           </h5>
-                          <small className="text-muted fw-bold">{s.label}</small>
+                          <small className="text-muted fw-bold">
+                            {s.label}
+                          </small>
                         </div>
                       </div>
                     ))}
@@ -262,6 +252,12 @@ export default function AboutUs() {
         .team-card:hover img {
           transform: scale(1.08);
         }
+        .first-section{
+           background-image:linear-gradient(rgba(3, 78, 3, 0.65), rgba(1, 78, 1, 0.65)), url("../assets/about-background.jpg");
+           background-size: cover;
+           background-position: center;
+           background-repeat: no-repeat;
+          }
       `}</style>
     </main>
   );

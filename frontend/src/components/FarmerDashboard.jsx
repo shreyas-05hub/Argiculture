@@ -39,6 +39,26 @@ const FarmerDashboard = () => {
     if (stored) setLandDetails(JSON.parse(stored));
   }, []);
 
+  // ==========================
+  // ⭐ LOAD CROPS (local)
+  // Stored key: "crops" (array of crop objects)
+  // Each crop: { id, farmerName, cropName, quantity, price, location, description, image, status, reason }
+  // status: "Draft" | "Pending" | "Accepted" | "Rejected"
+  // ==========================
+  useEffect(() => {
+    const storedCrops = JSON.parse(localStorage.getItem("crops")) || [];
+    // Show only crops belonging to current farmer (by farmer.username or farmer.email). We rely on farmerName field.
+    if (farmer) {
+      const myCrops = storedCrops.filter(
+        (c) => c.farmerName === (farmer.username || "")
+      );
+      setCrops(myCrops);
+    } else {
+      setCrops([]);
+    }
+  }, [farmer]);
+
+  // Handle land form input
   const handleChange = (e) => {
     const { name, value, files } = e.target;
 
@@ -70,13 +90,21 @@ const FarmerDashboard = () => {
   // ⭐ CROP FORM
   // ==========================
   const [formData, setFormData] = useState({
-    type: "",
-    name: "",
+    farmerName: "",
+    cropName: "",
     quantity: "",
-    amount: "",
+    price: "",
+    location: "",
     description: "",
     image: null,
   });
+
+  // When farmer is loaded, prefill farmerName in form
+  useEffect(() => {
+    if (farmer) {
+      setFormData((f) => ({ ...f, farmerName: farmer.username || "" }));
+    }
+  }, [farmer]);
 
   const handleCropChange = (e) => {
     const { name, value, files } = e.target;
@@ -86,18 +114,135 @@ const FarmerDashboard = () => {
     });
   };
 
+  const saveCropsToStorage = (allCrops) => {
+    // Merge with existing stored crops, replacing any with same id
+    const storedAll = JSON.parse(localStorage.getItem("crops")) || [];
+    // Remove crops belonging to this farmer from storedAll (we will re-add from allCrops)
+    const others = storedAll.filter(
+      (c) => c.farmerName !== (farmer?.username || "")
+    );
+    const merged = [...others, ...allCrops];
+    localStorage.setItem("crops", JSON.stringify(merged));
+  };
+
   const handleAdd = () => {
-    setCrops([...crops, formData]);
+    const newCrop = {
+      id: Date.now(),
+      farmerName: formData.farmerName || farmer?.username || "",
+      cropName: formData.cropName,
+      quantity: formData.quantity,
+      price: formData.price,
+      location: formData.location,
+      description: formData.description,
+      image: formData.image,
+      status: "Draft", // initial state
+      reason: "",
+    };
+
+    const updated = [...crops, newCrop];
+    setCrops(updated);
+    saveCropsToStorage(updated);
+
     setFormData({
-      type: "",
-      name: "",
+      farmerName: farmer?.username || "",
+      cropName: "",
       quantity: "",
-      amount: "",
+      price: "",
+      location: "",
       description: "",
       image: null,
     });
     setShowForm(false);
   };
+
+  // Send Request: create or update request in localStorage.cropRequests
+  const sendRequest = (cropId) => {
+    // Update crop status in local crops and in global storage
+    const updatedLocal = crops.map((c) =>
+      c.id === cropId ? { ...c, status: "Pending" } : c
+    );
+    setCrops(updatedLocal);
+    saveCropsToStorage(updatedLocal);
+
+    // Create request entry
+    const storedRequests =
+      JSON.parse(localStorage.getItem("cropRequests")) || [];
+    // check if already exists
+    const existing = storedRequests.find((r) => r.cropId === cropId);
+    if (existing) {
+      // update status
+      const updatedRequests = storedRequests.map((r) =>
+        r.cropId === cropId
+          ? { ...r, status: "Pending", timestamp: Date.now() }
+          : r
+      );
+      localStorage.setItem("cropRequests", JSON.stringify(updatedRequests));
+    } else {
+      const crop = updatedLocal.find((c) => c.id === cropId);
+      const newRequest = {
+        id: Date.now(),
+        cropId: crop.id,
+        farmerName: crop.farmerName,
+        cropName: crop.cropName,
+        quantity: crop.quantity,
+        price: crop.price,
+        location: crop.location,
+        description: crop.description,
+        image: crop.image,
+        status: "Pending",
+        reason: "",
+        timestamp: Date.now(),
+      };
+      localStorage.setItem(
+        "cropRequests",
+        JSON.stringify([...storedRequests, newRequest])
+      );
+    }
+
+    // Notify user by simple alert (you can replace with toast)
+    alert("Request sent. Status: Pending");
+  };
+
+  // Helper to refresh local crops state from global storage (useful after admin action)
+  const refreshMyCropsFromStorage = () => {
+    const stored = JSON.parse(localStorage.getItem("crops")) || [];
+    const myCrops = stored.filter(
+      (c) => c.farmerName === (farmer?.username || "")
+    );
+    setCrops(myCrops);
+  };
+
+  // Poll for updates (so that when admin acts on requests, farmer sees changes)
+  useEffect(() => {
+    const id = setInterval(() => {
+      // Reconcile requests with crops
+      const storedRequests =
+        JSON.parse(localStorage.getItem("cropRequests")) || [];
+      const storedCrops = JSON.parse(localStorage.getItem("crops")) || [];
+      let changed = false;
+
+      const reconciled = storedCrops.map((c) => {
+        const req = storedRequests.find((r) => r.cropId === c.id);
+        if (req && c.status !== req.status) {
+          changed = true;
+          return { ...c, status: req.status, reason: req.reason || "" };
+        }
+        return c;
+      });
+
+      if (changed) {
+        localStorage.setItem("crops", JSON.stringify(reconciled));
+        if (farmer) {
+          const my = reconciled.filter(
+            (c) => c.farmerName === (farmer.username || "")
+          );
+          setCrops(my);
+        }
+      }
+    }, 1000); // every 1s - lightweight
+
+    return () => clearInterval(id);
+  }, [farmer]);
 
   // ==========================
   // ⛔ Before render
@@ -119,7 +264,6 @@ const FarmerDashboard = () => {
 
   return (
     <div className="container mt-4">
-
       {/* Add Land Floating Button */}
       {!landDetails && (
         <button
@@ -149,7 +293,10 @@ const FarmerDashboard = () => {
                 <h5 className="modal-title">
                   {editMode ? "Edit Land Details" : "Add Land Details"}
                 </h5>
-                <button className="btn-close" onClick={() => setLandModal(false)} />
+                <button
+                  className="btn-close"
+                  onClick={() => setLandModal(false)}
+                />
               </div>
 
               <div className="modal-body">
@@ -210,7 +357,10 @@ const FarmerDashboard = () => {
                     Delete
                   </button>
                 )}
-                <button className="btn btn-secondary" onClick={() => setLandModal(false)}>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setLandModal(false)}
+                >
                   Cancel
                 </button>
               </div>
@@ -218,7 +368,6 @@ const FarmerDashboard = () => {
           </div>
         </div>
       )}
-
 
       {/* ⭐ HERO SECTION — unchanged structure */}
       <div className="card p-3 shadow-sm">
@@ -228,7 +377,7 @@ const FarmerDashboard = () => {
               src={avatar}
               alt="farmer"
               className="rounded-circle img-fluid"
-              style={{ width: "100px", height:"100px" }}
+              style={{ width: "100px", height: "100px" }}
             />
           </div>
 
@@ -243,7 +392,17 @@ const FarmerDashboard = () => {
           </div>
 
           <div className="col-md-4 text-end">
-            <button className="btn btn-success me-2" onClick={() => setShowForm(true)}>
+            <button
+              className="btn btn-success me-2"
+              onClick={() => {
+                // ensure farmerName is set when opening form
+                setFormData((f) => ({
+                  ...f,
+                  farmerName: farmer.username || "",
+                }));
+                setShowForm(true);
+              }}
+            >
               + Add Crop
             </button>
             <button
@@ -256,72 +415,154 @@ const FarmerDashboard = () => {
         </div>
       </div>
 
-            {/* ADD CROP FORM */}
-{showForm && (
-  <div className="card p-3 mt-4 shadow-sm">
-    <h5>Add New Crop</h5>
+      {/* ADD CROP FORM */}
+      {showForm && (
+        <div className="card p-3 mt-4 shadow-sm">
+          <h5>Add New Crop</h5>
 
-    <input
-      type="file"
-      name="image"
-      className="form-control mb-2"
-      onChange={handleCropChange}
-    />
+          <input
+            type="text"
+            name="farmerName"
+            placeholder="Farmer Name"
+            className="form-control mb-2"
+            value={formData.farmerName}
+            onChange={handleCropChange}
+          />
 
-    <input
-      type="text"
-      name="name"
-      placeholder="Crop Name"
-      className="form-control mb-2"
-      value={formData.name}
-      onChange={handleCropChange}
-    />
+          <input
+            type="file"
+            name="image"
+            className="form-control mb-2"
+            onChange={handleCropChange}
+          />
 
-    <input
-      type="text"
-      name="type"
-      placeholder="Crop Type"
-      className="form-control mb-2"
-      value={formData.type}
-      onChange={handleCropChange}
-    />
+          <input
+            type="text"
+            name="cropName"
+            placeholder="Crop Name"
+            className="form-control mb-2"
+            value={formData.cropName}
+            onChange={handleCropChange}
+          />
 
-    <input
-      type="number"
-      name="quantity"
-      placeholder="Quantity (kg)"
-      className="form-control mb-2"
-      value={formData.quantity}
-      onChange={handleCropChange}
-    />
+          <input
+            type="text"
+            name="location"
+            placeholder="Location"
+            className="form-control mb-2"
+            value={formData.location}
+            onChange={handleCropChange}
+          />
 
-    <input
-      type="number"
-      name="amount"
-      placeholder="Price (₹)"
-      className="form-control mb-2"
-      value={formData.amount}
-      onChange={handleCropChange}
-    />
+          <input
+            type="number"
+            name="quantity"
+            placeholder="Quantity (kg)"
+            className="form-control mb-2"
+            value={formData.quantity}
+            onChange={handleCropChange}
+          />
 
-    <textarea
-      name="description"
-      placeholder="Description"
-      className="form-control mb-2"
-      value={formData.description}
-      onChange={handleCropChange}
-    ></textarea>
+          <input
+            type="number"
+            name="price"
+            placeholder="Price (₹)"
+            className="form-control mb-2"
+            value={formData.price}
+            onChange={handleCropChange}
+          />
 
-    <div className="text-end">
-      <button className="btn btn-success me-2" onClick={handleAdd}>
-        Add Crop
-      </button>
-      <button className="btn btn-secondary" onClick={() => setShowForm(false)}>
-        Cancel
-      </button>
-    </div>
-  </div>
-)}
+          <textarea
+            name="description"
+            placeholder="Description"
+            className="form-control mb-2"
+            value={formData.description}
+            onChange={handleCropChange}
+          ></textarea>
+
+          <div className="text-end">
+            <button className="btn btn-success me-2" onClick={handleAdd}>
+              Add Crop
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setShowForm(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* CROPS TABLE SECTION (shows newly added crops with Send Request button) */}
+      <div className="user-table mt-4">
+        <h4>Your Crops</h4>
+
+        <div className="table-responsive mt-3">
+          <table className="table table-striped table-bordered">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Crop</th>
+                <th>Quantity (kg)</th>
+                <th>Price (₹)</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Reason</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {crops.length > 0 ? (
+                crops.map((c, index) => (
+                  <tr key={c.id}>
+                    <td>{index + 1}</td>
+                    <td>{c.cropName}</td>
+                    <td>{c.quantity}</td>
+                    <td>{c.price}</td>
+                    <td>{c.location || "—"}</td>
+                    <td>{c.status}</td>
+                    <td style={{ maxWidth: "200px", wordBreak: "break-word" }}>
+                      {c.status === "Rejected" ? c.reason || "—" : "—"}
+                    </td>
+                    <td>
+                      {c.status === "Draft" && (
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() => sendRequest(c.id)}
+                        >
+                          Send Request
+                        </button>
+                      )}
+
+                      {c.status === "Pending" && (
+                        <span className="badge bg-warning text-dark">
+                          Pending
+                        </span>
+                      )}
+
+                      {c.status === "Accepted" && (
+                        <span className="badge bg-success">Accepted</span>
+                      )}
+
+                      {c.status === "Rejected" && (
+                        <span className="badge bg-danger">Rejected</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="text-center">
+                    No crops added.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* LAND DETAILS SECTION */}
       {landDetails && (
@@ -339,7 +580,8 @@ const FarmerDashboard = () => {
               <h4>Land Details</h4>
               <p>
                 <strong>Land Size:</strong> {landDetails.landSize} Acres <br />
-                <strong>Years of Farming:</strong> {landDetails.yearsFarming} <br />
+                <strong>Years of Farming:</strong> {landDetails.yearsFarming}{" "}
+                <br />
                 <strong>Address:</strong> {landDetails.landAddress} <br />
                 <strong>Crops Grown:</strong> {landDetails.cropTypes}
               </p>
@@ -380,40 +622,67 @@ const FarmerDashboard = () => {
         </div>
       </div>
 
-      {/* Crops Section */}
+      {/* Previous / Accepted Crops Cards */}
       <div className="mt-4">
         <h5>{showPrevious ? "Previous Crops" : "Newly Added Crops"}</h5>
         <div className="row">
-          {crops.map((crop, index) => (
-            <div key={index} className="col-md-3 mt-3">
-              <div className="card shadow-sm">
-                {crop.image && (
-                  <img
-                    src={crop.image}
-                    className="card-img-top"
-                    style={{ height: "150px", objectFit: "cover" }}
-                    alt={crop.name}
-                  />
-                )}
-                <div className="card-body">
-                  <h6>{crop.name}</h6>
-                  <p className="m-2">
-                    <strong>Type:</strong> {crop.type}
-                  </p>
-                  <p className="m-2">
-                    <strong>Quantity:</strong> {crop.quantity} kg
-                  </p>
-                  <p className="m-2">
-                    <strong>Price:</strong> ₹{crop.amount}
-                  </p>
-                  <p className="small">{crop.description}</p>
-                </div>
-              </div>
-            </div>
-          ))}
+          {showPrevious
+            ? // show only accepted crops
+              crops
+                .filter((c) => c.status === "Accepted")
+                .map((crop, index) => (
+                  <div key={crop.id} className="col-md-3 mt-3">
+                    <div className="card shadow-sm">
+                      {crop.image && (
+                        <img
+                          src={crop.image}
+                          className="card-img-top"
+                          style={{ height: "150px", objectFit: "cover" }}
+                          alt={crop.cropName}
+                        />
+                      )}
+                      <div className="card-body">
+                        <h6>{crop.cropName}</h6>
+                        <p className="m-2">
+                          <strong>Qty:</strong> {crop.quantity} kg
+                        </p>
+                        <p className="m-2">
+                          <strong>Price:</strong> ₹{crop.price}
+                        </p>
+                        <p className="small">{crop.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+            : // show all (non-accepted) as newly added
+              crops
+                .filter((c) => c.status !== "Accepted")
+                .map((crop, index) => (
+                  <div key={crop.id} className="col-md-3 mt-3">
+                    <div className="card shadow-sm">
+                      {crop.image && (
+                        <img
+                          src={crop.image}
+                          className="card-img-top"
+                          style={{ height: "150px", objectFit: "cover" }}
+                          alt={crop.cropName}
+                        />
+                      )}
+                      <div className="card-body">
+                        <h6>{crop.cropName}</h6>
+                        <p className="m-2">
+                          <strong>Qty:</strong> {crop.quantity} kg
+                        </p>
+                        <p className="m-2">
+                          <strong>Price:</strong> ₹{crop.price}
+                        </p>
+                        <p className="small">{crop.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
         </div>
       </div>
-
     </div>
   );
 };

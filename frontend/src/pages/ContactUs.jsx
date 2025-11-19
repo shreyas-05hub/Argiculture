@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 
-
-
 const Contact = () => {
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
   const [alert, setAlert] = useState(null);
 
   const handleChange = (e) =>
@@ -22,7 +24,7 @@ const Contact = () => {
       <section
         className="text-center text-white d-flex align-items-center justify-content-center position-relative"
         style={{
-          backgroundImage: "url('/assets/Contact.jpg')",
+          backgroundImage: "url('../assets/images.jpg')",
           height: "50vh",
           backgroundSize: "cover",
           backgroundPosition: "center",
@@ -35,7 +37,8 @@ const Contact = () => {
         <div className="position-relative p-3">
           <h1 className="display-4 fw-bold">Contact Us</h1>
           <p className="lead mt-2">
-            We’re here to answer your questions and help grow your agricultural success.
+            We’re here to answer your questions and help grow your agricultural
+            success.
           </p>
         </div>
       </section>
@@ -48,7 +51,8 @@ const Contact = () => {
             <div className="col-lg-6">
               <h2 className="fw-bold mb-3 text-success">Get In Touch</h2>
               <p className="text-muted mb-4">
-                Have questions about our agricultural services? We’d love to assist you.
+                Have questions about our agricultural services? We’d love to
+                assist you.
               </p>
 
               <form onSubmit={handleSubmit}>
@@ -91,7 +95,10 @@ const Contact = () => {
                   ></textarea>
                 </div>
 
-                <button type="submit" className="btn btn-success px-4 fw-semibold">
+                <button
+                  type="submit"
+                  className="btn btn-success px-4 fw-semibold"
+                >
                   Send Message
                 </button>
               </form>

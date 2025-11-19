@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/AdminDash.css";
+import AdminLayout from "./AdminLayout";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
-  const [showSidebar, setShowSidebar] = useState(false);
+  // const [showSidebar, setShowSidebar] = useState(false);
 
   useEffect(() => {
     const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
@@ -22,11 +23,11 @@ const AdminDashboard = () => {
   const totalTraders = users.filter((u) => u.role === "enduser").length;
 
   return (
-    <div className="admin-dashboard container-fluid">
-      <div className="row">
-
-        {/* Sidebar */}
-        <div className={`col-md-3 sidebar ${showSidebar ? "active" : ""}`}>
+    <AdminLayout>
+      <div className="admin-dashboard container-fluid">
+        <div className="row">
+          {/* Sidebar */}
+          {/* <div className={`col-md-3 sidebar ${showSidebar ? "active" : ""}`}>
           <button
             className="close-btn d-md-none"
             onClick={() => setShowSidebar(false)}
@@ -53,103 +54,101 @@ const AdminDashboard = () => {
               Settings
             </Link>
           </ul>
-        </div>
+        </div> */}
 
-        {/* Main Content */}
-        <div className="col-md-9 content">
+          {/* Main Content */}
+          <div className="col-md-12 content">
+            {/* Mobile Menu Toggle */}
+            {/* <button
+              className="btn btn-outline-success d-md-none mb-3"
+              onClick={() => setShowSidebar(!showSidebar)}
+            >
+              {showSidebar ? "Hide Menu" : "☰ Menu"}
+            </button> */}
 
-          {/* Mobile Menu Toggle */}
-          <button
-            className="btn btn-outline-success d-md-none mb-3"
-            onClick={() => setShowSidebar(!showSidebar)}
-          >
-            {showSidebar ? "Hide Menu" : "☰ Menu"}
-          </button>
+            <h2>Welcome, Admin 👨‍💼</h2>
 
-          <h2>Welcome, Admin 👨‍💼</h2>
+            {/* Statistics */}
+            <div className="row stats">
+              <div className="col-md-4 col-sm-12 mb-3">
+                <div className="card stat-card">
+                  <h5>Total Farmers</h5>
+                  <p>{totalFarmers}</p>
+                </div>
+              </div>
 
-          {/* Statistics */}
-          <div className="row stats">
-            <div className="col-md-4 col-sm-12 mb-3">
-              <div className="card stat-card">
-                <h5>Total Farmers</h5>
-                <p>{totalFarmers}</p>
+              <div className="col-md-4 col-sm-12 mb-3">
+                <div className="card stat-card">
+                  <h5>Total Traders</h5>
+                  <p>{totalTraders}</p>
+                </div>
+              </div>
+
+              <div className="col-md-4 col-sm-12 mb-3">
+                <div className="card stat-card">
+                  <h5>Total Users</h5>
+                  <p>{users.length}</p>
+                </div>
               </div>
             </div>
 
-            <div className="col-md-4 col-sm-12 mb-3">
-              <div className="card stat-card">
-                <h5>Total Traders</h5>
-                <p>{totalTraders}</p>
-              </div>
-            </div>
+            {/* Users Table */}
+            <div className="user-table mt-4">
+              <h4>All Registered Users</h4>
 
-            <div className="col-md-4 col-sm-12 mb-3">
-              <div className="card stat-card">
-                <h5>Total Users</h5>
-                <p>{users.length}</p>
-              </div>
-            </div>
-          </div>
+              <div className="table-responsive">
+                <table className="table table-striped table-bordered">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Username</th>
+                      <th>Role</th>
+                      <th>Email</th>
+                      <th>Address</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
 
-          {/* Users Table */}
-          <div className="user-table mt-4">
-            <h4>All Registered Users</h4>
+                  <tbody>
+                    {users.length > 0 ? (
+                      users.map((u, index) => (
+                        <tr key={index}>
+                          <td>{index + 1}</td>
 
-            <div className="table-responsive">
-              <table className="table table-striped table-bordered">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Username</th>
-                    <th>Role</th>
-                    <th>Email</th>
-                    <th>Address</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
+                          {/* FIXED: username */}
+                          <td>{u.username}</td>
 
-                <tbody>
-                  {users.length > 0 ? (
-                    users.map((u, index) => (
-                      <tr key={index}>
-                        <td>{index + 1}</td>
+                          <td>{u.role}</td>
+                          <td>{u.email}</td>
 
-                        {/* FIXED: username */}
-                        <td>{u.username}</td>
+                          {/* FIXED: location → address */}
+                          <td>{u.address || "—"}</td>
 
-                        <td>{u.role}</td>
-                        <td>{u.email}</td>
-
-                        {/* FIXED: location → address */}
-                        <td>{u.address || "—"}</td>
-
-                        <td>
-                          <button
-                            className="btn btn-danger btn-sm"
-                            onClick={() => removeUser(index)}
-                          >
-                            Remove
-                          </button>
+                          <td>
+                            <button
+                              className="btn btn-danger btn-sm"
+                              onClick={() => removeUser(index)}
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="6" className="text-center">
+                          No users found.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="6" className="text-center">
-                        No users found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

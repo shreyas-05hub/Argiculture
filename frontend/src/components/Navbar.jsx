@@ -144,7 +144,7 @@ const Navbar = () => {
 
           {/* Farmer + EndUser Dropdown */}
           {user && (role === "farmer" || role === "enduser") && (
-            <div className="dropdown-container">
+            <div className="dropdown-container text-center">
               <div
                 className="user-icon"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -163,7 +163,7 @@ const Navbar = () => {
                   </Link>
 
                   <button
-                    className="dropdown-item-custom text-danger"
+                    className="dropdown-item-custom text-danger rounded-pill m-auto"
                     onClick={handleLogout}
                   >
                     <i className="bi bi-box-arrow-right me-2"></i> Logout
