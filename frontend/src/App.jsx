@@ -22,6 +22,7 @@ import AdminDashboard from './components/AdminDashboard'
 import FarmerDashboard from './components/FarmerDashboard'
 // import UserDashboard from './components/UserDashboard'
 import Orders from './pages/Orders';
+import Query from './pages/Query';
 import "./styles/style.css"
 import ScrollToTop from './components/ScrollToTop';
 const App = () => {
@@ -82,6 +83,7 @@ const App = () => {
         <Route path='/usermanagement' element={<UserManagement/>}/>
         <Route path='/settings' element={<Settings/>}/>
         <Route path='/reports' element={<Reports/>}/>
+        <Route path='/query' element={<Query/>}/>
       </Routes>
       <Footer/>
     </div>

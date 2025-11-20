@@ -32,6 +32,10 @@ const AdminLayout = ({ children }) => {
               Reports
             </Link>
 
+            <Link to="/query" className="list-group-item">
+              Queries
+            </Link>
+
             <Link to="/settings" className="list-group-item">
               Settings
             </Link>
