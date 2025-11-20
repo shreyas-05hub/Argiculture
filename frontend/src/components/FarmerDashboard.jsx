@@ -96,7 +96,7 @@ const FarmerDashboard = () => {
     price: "",
     location: "",
     description: "",
-    image: null,
+    image: [],
   });
 
   // When farmer is loaded, prefill farmerName in form
@@ -108,6 +108,31 @@ const FarmerDashboard = () => {
 
   const handleCropChange = (e) => {
     const { name, value, files } = e.target;
+
+    if (name === "images"){
+      const allowed = ["image/jpeg", "image/png", "image/jpg"];
+      const selected = Array.from(files);
+
+      //Validation
+      if (selected.length < 5){
+        alert("Please select at least 5 images.");
+        return;
+      }
+
+      //only jpeg, png, jpg
+      const invalid = selected.some((file) => !allowed.includes(file.type));
+      if (invalid){
+        alert("Only JPEG, PNG, JPG images are allowed.");
+        return;
+      }
+      
+      // Convert to Preview URLs
+      const imgArray = selected.map((file) => URL.createObjectURL(file));
+
+      setFormData({ ...formData, images: imgArray });
+    }else{
+      setFormData({ ...formData, [name]: value });
+    }
     setFormData({
       ...formData,
       [name]: files ? URL.createObjectURL(files[0]) : value,
@@ -433,6 +458,8 @@ const FarmerDashboard = () => {
             type="file"
             name="image"
             className="form-control mb-2"
+            multiple
+            accept="image/jpeg,image/png,image/jpg"
             onChange={handleCropChange}
           />
 
