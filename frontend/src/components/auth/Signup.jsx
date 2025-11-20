@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import "./Signup.css";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const roleFromURL = searchParams.get("role") || "enduser";
 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -11,7 +13,7 @@ const Signup = () => {
     mobile_no: "",
     email: "",
     password: "",
-    role: "enduser",
+    role: roleFromURL,
   });
 
   const [error, setError] = useState("");

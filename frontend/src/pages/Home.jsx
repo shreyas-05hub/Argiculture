@@ -31,10 +31,10 @@ const Home = () => {
             <strong>Customers</strong> powered by Artificial Intelligence.
           </p>
           <div className="mt-4">
-            <Link to="/signup" className="btn btn-light btn-lg m-2">
+            <Link to="/signup?role=farmer" className="btn btn-light btn-lg m-2">
               Join as Farmer
             </Link>
-            <Link to="/signup" className="btn btn-outline-light btn-lg m-2">
+            <Link to="/signup?role=enduser" className="btn btn-outline-light btn-lg m-2">
               Join as Customer
             </Link>
           </div>
@@ -190,10 +190,10 @@ const Home = () => {
             Join thousands of farmers and customers using AI to grow profits and
             build trust in agriculture.
           </p>
-          <Link to="/signup" className="btn btn-dark btn-lg m-2">
+          <Link to="/signup?role=farmer" className="btn btn-dark btn-lg m-2">
             Join as Farmer
           </Link>
-          <Link to="/signup" className="btn btn-outline-dark btn-lg m-2">
+          <Link to="/signup?role=enduser" className="btn btn-outline-dark btn-lg m-2">
             Join as Customer
           </Link>
         </div>

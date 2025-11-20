@@ -23,7 +23,7 @@ import FarmerDashboard from './components/FarmerDashboard'
 // import UserDashboard from './components/UserDashboard'
 import Orders from './pages/Orders';
 import "./styles/style.css"
-
+import ScrollToTop from './components/ScrollToTop';
 const App = () => {
 
   useEffect(() => {
@@ -45,7 +45,8 @@ const App = () => {
 }, []);
 
   return (
-    <div>
+    <div>6
+      <ScrollToTop/>
       <Navbar/>
       <Routes>
         <Route path='/' element={<Home/>}/>
