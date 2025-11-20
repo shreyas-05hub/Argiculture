@@ -45,7 +45,7 @@ const App = () => {
 }, []);
 
   return (
-    <div>6
+    <div>
       <ScrollToTop/>
       <Navbar/>
       <Routes>
