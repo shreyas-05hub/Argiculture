@@ -126,8 +126,8 @@ const Navbar = () => {
             </Link>
           )}
 
-          {/* Admin */}
-          {user && role === "admin" && (
+          {/* Admin + Farmer */}
+          {user && (role === "admin" || role === "farmer") && (
             <div className="d-flex align-items-center gap-3">
               <Link to="/profile" className="fw-bold text-dark">
                 👤 {user.username}
@@ -142,8 +142,8 @@ const Navbar = () => {
             </div>
           )}
 
-          {/* Farmer + EndUser Dropdown */}
-          {user && (role === "farmer" || role === "enduser") && (
+          {/* EndUser Dropdown */}
+          {user && (role === "enduser") && (
             <div className="dropdown-container text-center">
               <div
                 className="user-icon"

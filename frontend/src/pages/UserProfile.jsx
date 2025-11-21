@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import {
   Container,
   Row,
@@ -10,18 +10,14 @@ import {
   Button,
 } from "react-bootstrap";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import Cropper from "react-easy-crop";
-import getCroppedImg from "./cropImage";
 import "./UserProfile.css";
 
 const UserProfile = () => {
-  // ---- Load real logged-in user ----
   const loggedIn = JSON.parse(localStorage.getItem("loggedInUser"));
   const allUsers = JSON.parse(localStorage.getItem("users")) || [];
 
   const realUser = allUsers.find((u) => u.email === loggedIn?.email);
 
-  // ---- Initial User State ----
   const [user, setUser] = useState({
     name: realUser?.username || "Unknown",
     contact: realUser?.phone || realUser?.email || "",
@@ -32,7 +28,6 @@ const UserProfile = () => {
     experience: realUser?.experience || "",
   });
 
-  // ----- Combined Edit Mode -----
   const [editAll, setEditAll] = useState(false);
   const [tempUser, setTempUser] = useState({ ...user });
 
@@ -55,7 +50,6 @@ const UserProfile = () => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  // ---- Update localStorage ----
   const updateLocalStorage = (updatedUser) => {
     const updatedUsers = allUsers.map((u) =>
       u.email === loggedIn.email
@@ -74,44 +68,24 @@ const UserProfile = () => {
     localStorage.setItem("users", JSON.stringify(updatedUsers));
   };
 
-  // ---- IMAGE CROPPING ----
-  const [imageSrc, setImageSrc] = useState(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [showCropper, setShowCropper] = useState(false);
-
+  // -------------------- IMAGE UPLOAD (Only in Edit Mode) --------------------
   const handleImageUpload = (e) => {
+    if (!editAll) return; // block image editing when not in edit mode
+
     const file = e.target.files[0];
     if (!file) return;
+
     const reader = new FileReader();
     reader.onload = () => {
-      setImageSrc(reader.result);
-      setShowCropper(true);
+      setUser((prev) => ({ ...prev, profilePic: reader.result }));
     };
     reader.readAsDataURL(file);
   };
 
-  const onCropComplete = useCallback((croppedArea, croppedPixels) => {
-    setCroppedAreaPixels(croppedPixels);
-  }, []);
-
-  const saveCroppedImage = async () => {
-    try {
-      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
-      const updatedUser = { ...user, profilePic: croppedImage };
-      setUser(updatedUser);
-      updateLocalStorage(updatedUser);
-      setShowCropper(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const removeImage = () => {
-    const updatedUser = { ...user, profilePic: null };
-    setUser(updatedUser);
-    updateLocalStorage(updatedUser);
+    if (!editAll) return;
+
+    setUser((prev) => ({ ...prev, profilePic: null }));
   };
 
   return (
@@ -132,17 +106,21 @@ const UserProfile = () => {
               className="profile-pic mb-3"
             />
 
-            <label className="btn btn-sm btn-primary mt-2">
-              Upload Image
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                hidden
-              />
-            </label>
+            {/* Image Upload button (ONLY IN EDIT MODE) */}
+            {editAll && (
+              <label className="btn btn-sm btn-primary mt-2">
+                Upload Image
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  hidden
+                />
+              </label>
+            )}
 
-            {user.profilePic && (
+            {/* Remove button (ONLY IN EDIT MODE & if image exists) */}
+            {editAll && user.profilePic && (
               <button
                 className="btn btn-sm btn-outline-danger mt-2"
                 onClick={removeImage}
@@ -240,9 +218,7 @@ const UserProfile = () => {
                       <h6>{user.role}</h6>
                     </div>
 
-                    {/* ------------ ROLE BASED FIELDS ------------ */}
-
-                    {/* FARMER FIELDS ONLY */}
+                    {/* FARMER FIELDS */}
                     {user.role === "farmer" && (
                       <>
                         <div className="info-item mt-3">
@@ -273,16 +249,12 @@ const UserProfile = () => {
                       </>
                     )}
 
-                    {/* BUYER FIELDS (You can add more later) */}
+                    {/* BUYER FIELDS */}
                     {user.role === "buyer" && (
-                      <>
-                        <div className="info-item mt-3">
-                          <h6>Buyer Profile</h6>
-                          <p>
-                            You can add buyer fields here (GST, Company Name...)
-                          </p>
-                        </div>
-                      </>
+                      <div className="info-item mt-3">
+                        <h6>Buyer Profile</h6>
+                        <p>Add buyer-specific fields later.</p>
+                      </div>
                     )}
                   </div>
                 </Tab.Pane>
@@ -291,35 +263,6 @@ const UserProfile = () => {
           </Col>
         </Row>
       </Card>
-
-      {/* IMAGE CROPPER MODAL */}
-      {showCropper && (
-        <div className="cropper-modal">
-          <div className="cropper-box">
-            <Cropper
-              image={imageSrc}
-              crop={crop}
-              zoom={zoom}
-              aspect={1}
-              cropShape="round"
-              showGrid={false}
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={onCropComplete}
-            />
-
-            <div className="crop-controls">
-              <Button variant="success" onClick={saveCroppedImage}>
-                Save
-              </Button>
-
-              <Button variant="danger" onClick={() => setShowCropper(false)}>
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </Container>
   );
 };

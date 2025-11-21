@@ -14,7 +14,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Login from './components/auth/Login'
 import Signup from './components/auth/Signup'
 import UserProfile from './pages/UserProfile'
-import UserManagement from './pages/UserManagement'
+import MarketManagement from './pages/MarketManagement'
 import Settings from './pages/Settings'
 import Reports from './pages/Reports'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -80,7 +80,7 @@ const App = () => {
             </ProtectedRoute>}/>        
         <Route path='/profile' element={<UserProfile/>}/>
         <Route path='/orders' element={<Orders/>}/>
-        <Route path='/usermanagement' element={<UserManagement/>}/>
+        <Route path='/usermanagement' element={<MarketManagement/>}/>
         <Route path='/settings' element={<Settings/>}/>
         <Route path='/reports' element={<Reports/>}/>
         <Route path='/query' element={<Query/>}/>
