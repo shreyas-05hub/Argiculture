@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Row,
@@ -12,24 +12,135 @@ import {
 import { FaEdit, FaTrash } from "react-icons/fa";
 import "./UserProfile.css";
 
-const UserProfile = () => {
-  const loggedIn = JSON.parse(localStorage.getItem("loggedInUser"));
-  const allUsers = JSON.parse(localStorage.getItem("users")) || [];
+/*
+  Assumptions:
+  - GET user endpoint: GET http://127.0.0.1:8000/user/<id>/
+    (returns fields like id, username, email, first_name, last_name,
+     mobile_no, role, address, profile_picture (url or base64), acres, experience)
+  - Update endpoint: POST http://127.0.0.1:8000/api/update-profile/<id>/
+    (accepts JSON and saves fields)
+  - loggedInUser is stored in localStorage after login and contains at least {id, email}
+*/
 
-  const realUser = allUsers.find((u) => u.email === loggedIn?.email);
+const API_BASE = "http://127.0.0.1:8000";
+
+const UserProfile = () => {
+  const loggedIn = JSON.parse(localStorage.getItem("loggedInUser") || "null");
+  const localUsers = JSON.parse(localStorage.getItem("users") || "[]");
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [user, setUser] = useState({
-    name: realUser?.username || "Unknown",
-    contact: realUser?.phone || realUser?.email || "",
-    address: realUser?.address || "",
-    profilePic: realUser?.profilePic || null,
-    role: realUser?.role || "",
-    acres: realUser?.acres || "",
-    experience: realUser?.experience || "",
+    id: null,
+    firstName: "",
+    lastName: "",
+    fullName: "",
+    contact: "",
+    email: "",
+    address: "",
+    profilePic: null, // base64 string or URL
+    role: "",
+    acres: "",
+    experience: "",
   });
 
   const [editAll, setEditAll] = useState(false);
-  const [tempUser, setTempUser] = useState({ ...user });
+  const [tempUser, setTempUser] = useState(null);
+
+  // Fetch user from backend by id (best source of truth)
+  useEffect(() => {
+    async function fetchUser() {
+      setLoading(true);
+      setError(null);
+
+      // 1) If we have loggedIn user with id -> fetch from backend
+      if (loggedIn && loggedIn.id) {
+        try {
+          const resp = await fetch(`${API_BASE}/user/${loggedIn.id}/`);
+          if (!resp.ok) {
+            const json = await resp.json().catch(() => ({}));
+            throw new Error(json.error || `Server returned ${resp.status}`);
+          }
+          const data = await resp.json();
+
+          // map fields (backend names might differ slightly; adjust if needed)
+          setUser({
+            id: data.id || loggedIn.id,
+            firstName: data.first_name || data.firstName || "",
+            lastName: data.last_name || data.lastName || "",
+            fullName:
+              (data.first_name || data.firstName || "") +
+              (data.last_name || data.lastName ? ` ${data.last_name || data.lastName}` : ""),
+            contact: data.mobile_no || data.contact || "",
+            email: data.email || loggedIn.email || "",
+            address: data.address || "",
+            profilePic: data.profile_picture || data.profilePic || null,
+            role: data.role || "",
+            acres: data.acres || data.acre || "",
+            experience: data.experience || "",
+          });
+
+          setLoading(false);
+        } catch (err) {
+          console.error("Fetch user failed:", err);
+          setError("Failed to fetch user from server. See console for details.");
+          // fallback: try to populate from localStorage users array if available
+          if (localUsers.length > 0 && loggedIn && loggedIn.email) {
+            const lu = localUsers.find((u) => u.email === loggedIn.email);
+            if (lu) {
+              setUser({
+                id: lu.id || loggedIn.id,
+                firstName: lu.firstName || lu.first_name || "",
+                lastName: lu.lastName || lu.last_name || "",
+                fullName: (lu.firstName || "") + (lu.lastName ? ` ${lu.lastName}` : ""),
+                contact: lu.phone || lu.mobile_no || lu.contact || "",
+                email: lu.email || loggedIn.email || "",
+                address: lu.address || "",
+                profilePic: lu.profilePic || lu.profile_picture || null,
+                role: lu.role || "",
+                acres: lu.acres || "",
+                experience: lu.experience || "",
+              });
+              setLoading(false);
+              return;
+            }
+          }
+          setLoading(false);
+        }
+        return;
+      }
+
+      // 2) If loggedIn exists but no id, try to get from local users array
+      if (localUsers.length > 0 && loggedIn && loggedIn.email) {
+        const lu = localUsers.find((u) => u.email === loggedIn.email);
+        if (lu) {
+          setUser({
+            id: lu.id || null,
+            firstName: lu.firstName || lu.first_name || "",
+            lastName: lu.lastName || lu.last_name || "",
+            fullName: (lu.firstName || "") + (lu.lastName ? ` ${lu.lastName}` : ""),
+            contact: lu.phone || lu.mobile_no || lu.contact || "",
+            email: lu.email || loggedIn.email || "",
+            address: lu.address || "",
+            profilePic: lu.profilePic || lu.profile_picture || null,
+            role: lu.role || "",
+            acres: lu.acres || "",
+            experience: lu.experience || "",
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
+      // 3) Nothing found
+      setError("User not logged in or user id not available.");
+      setLoading(false);
+    }
+
+    fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // run once
 
   const startEditAll = () => {
     setTempUser({ ...user });
@@ -37,43 +148,30 @@ const UserProfile = () => {
   };
 
   const cancelEditAll = () => {
-    setUser({ ...tempUser });
-    setEditAll(false);
-  };
-
-  const saveEditAll = () => {
-    updateLocalStorage(user);
+    if (tempUser) setUser({ ...tempUser });
     setEditAll(false);
   };
 
   const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const updated = { ...user, [name]: value };
+    if (name === "firstName" || name === "lastName") {
+      updated.fullName = `${updated.firstName || ""} ${updated.lastName || ""}`.trim();
+    }
+    setUser(updated);
   };
 
-  const updateLocalStorage = (updatedUser) => {
-    const updatedUsers = allUsers.map((u) =>
-      u.email === loggedIn.email
-        ? {
-            ...u,
-            username: updatedUser.name,
-            phone: updatedUser.contact,
-            address: updatedUser.address,
-            profilePic: updatedUser.profilePic,
-            acres: updatedUser.acres,
-            experience: updatedUser.experience,
-          }
-        : u
-    );
-
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-  };
-
-  // -------------------- IMAGE UPLOAD (Only in Edit Mode) --------------------
+  // image file -> base64
   const handleImageUpload = (e) => {
-    if (!editAll) return; // block image editing when not in edit mode
-
+    if (!editAll) return;
     const file = e.target.files[0];
     if (!file) return;
+
+    const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      alert("Only JPG, JPEG, PNG allowed");
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -84,15 +182,87 @@ const UserProfile = () => {
 
   const removeImage = () => {
     if (!editAll) return;
-
     setUser((prev) => ({ ...prev, profilePic: null }));
   };
+
+  // Save to backend + sync localStorage users array
+  const saveEditAll = async () => {
+    if (!user.id) {
+      alert("Cannot update: user id missing.");
+      return;
+    }
+
+    // prepare payload - send only the fields your backend expects
+    const payload = {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      fullName: user.fullName,
+      contact: user.contact,
+      address: user.address,
+      acres: user.acres,
+      experience: user.experience,
+      profilePic: user.profilePic, // base64 or url depending on backend handling
+    };
+
+    try {
+      const resp = await fetch(`${API_BASE}/api/update-profile/${user.id}/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const json = await resp.json().catch(() => ({}));
+      if (!resp.ok) {
+        console.error("Update error:", json);
+        alert(json.error || "Update failed");
+        return;
+      }
+
+      // sync local users array if present
+      try {
+        const updatedUsers = localUsers.map((u) =>
+          u.email === user.email
+            ? {
+                ...u,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                username: user.fullName || u.username,
+                phone: user.contact,
+                mobile_no: user.contact,
+                address: user.address,
+                profilePic: user.profilePic,
+                // acres: user.acres,
+                // experience: user.experience,
+              }
+            : u
+        );
+        localStorage.setItem("users", JSON.stringify(updatedUsers));
+      } catch (e) {
+        // ignore localStorage sync errors
+        console.warn("localStorage sync failed", e);
+      }
+
+      alert(json.message || "Profile updated successfully");
+      setEditAll(false);
+    } catch (err) {
+      console.error("Save failed:", err);
+      alert("Server error while updating profile.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <Container className="mt-5">
+        <h5>Loading profile...</h5>
+      </Container>
+    );
+  }
 
   return (
     <Container className="profile-container mt-5 mb-5">
       <Card className="shadow-lg border-0 profile-card p-4">
         <Row>
-          {/* LEFT SIDE */}
+          {/* LEFT */}
           <Col
             md={4}
             className="text-center border-end d-flex flex-column align-items-center justify-content-center"
@@ -100,26 +270,26 @@ const UserProfile = () => {
             <img
               src={
                 user.profilePic ||
-                `https://ui-avatars.com/api/?name=${user.name}&background=0D8ABC&color=fff`
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                  user.fullName || user.email || "User"
+                )}&background=0D8ABC&color=fff`
               }
               alt="User"
               className="profile-pic mb-3"
             />
 
-            {/* Image Upload button (ONLY IN EDIT MODE) */}
             {editAll && (
               <label className="btn btn-sm btn-primary mt-2">
                 Upload Image
                 <input
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/jpg,image/png"
                   onChange={handleImageUpload}
                   hidden
                 />
               </label>
             )}
 
-            {/* Remove button (ONLY IN EDIT MODE & if image exists) */}
             {editAll && user.profilePic && (
               <button
                 className="btn btn-sm btn-outline-danger mt-2"
@@ -129,11 +299,11 @@ const UserProfile = () => {
               </button>
             )}
 
-            <h5 className="text-muted mt-3">{user.name}</h5>
+            <h5 className="text-muted mt-3">{user.fullName || user.email}</h5>
             <h6 className="text-secondary">{user.role}</h6>
           </Col>
 
-          {/* RIGHT SIDE */}
+          {/* RIGHT */}
           <Col md={8} className="p-4">
             <Tab.Container defaultActiveKey="profile">
               <Nav variant="tabs" className="mb-3">
@@ -142,7 +312,6 @@ const UserProfile = () => {
                 </Nav.Item>
               </Nav>
 
-              {/* Edit Buttons */}
               <div className="d-flex justify-content-end mb-3">
                 {!editAll ? (
                   <Button variant="warning" onClick={startEditAll}>
@@ -150,11 +319,7 @@ const UserProfile = () => {
                   </Button>
                 ) : (
                   <>
-                    <Button
-                      className="me-2"
-                      variant="success"
-                      onClick={saveEditAll}
-                    >
+                    <Button className="me-2" variant="success" onClick={saveEditAll}>
                       Save All
                     </Button>
                     <Button variant="danger" onClick={cancelEditAll}>
@@ -167,18 +332,33 @@ const UserProfile = () => {
               <Tab.Content>
                 <Tab.Pane eventKey="profile">
                   <div className="user-info">
-                    {/* NAME */}
+                    {/* FIRST NAME */}
                     <div className="info-item mt-3">
-                      <h6>Name:</h6>
+                      <h6>First Name:</h6>
                       {editAll ? (
                         <Form.Control
                           type="text"
-                          name="name"
-                          value={user.name}
+                          name="firstName"
+                          value={user.firstName}
                           onChange={handleChange}
                         />
                       ) : (
-                        <h5>{user.name}</h5>
+                        <h5>{user.firstName}</h5>
+                      )}
+                    </div>
+
+                    {/* LAST NAME */}
+                    <div className="info-item mt-3">
+                      <h6>Last Name:</h6>
+                      {editAll ? (
+                        <Form.Control
+                          type="text"
+                          name="lastName"
+                          value={user.lastName}
+                          onChange={handleChange}
+                        />
+                      ) : (
+                        <h5>{user.lastName}</h5>
                       )}
                     </div>
 
@@ -197,6 +377,21 @@ const UserProfile = () => {
                       )}
                     </div>
 
+                    {/* EMAIL */}
+                      <div className="info-item mt-4">
+                      <h6>Email:</h6>
+                      {editAll ? (
+                        <Form.Control
+                          type="text"
+                          name="contact"
+                          value={user.email}
+                          onChange={handleChange}
+                        />
+                      ) : (
+                        <h6>{user.email}</h6>
+                      )}
+                    </div>
+                    
                     {/* ADDRESS */}
                     <div className="info-item mt-4">
                       <h6>Address:</h6>
@@ -219,7 +414,7 @@ const UserProfile = () => {
                     </div>
 
                     {/* FARMER FIELDS */}
-                    {user.role === "farmer" && (
+                    {/* {user.role === "farmer" && (
                       <>
                         <div className="info-item mt-3">
                           <Form.Label>Land Acres</Form.Label>
@@ -247,19 +442,13 @@ const UserProfile = () => {
                           )}
                         </div>
                       </>
-                    )}
-
-                    {/* BUYER FIELDS */}
-                    {user.role === "buyer" && (
-                      <div className="info-item mt-3">
-                        <h6>Buyer Profile</h6>
-                        <p>Add buyer-specific fields later.</p>
-                      </div>
-                    )}
+                    )} */}
                   </div>
                 </Tab.Pane>
               </Tab.Content>
             </Tab.Container>
+
+            {error && <div className="text-danger mt-3">{error}</div>}
           </Col>
         </Row>
       </Card>

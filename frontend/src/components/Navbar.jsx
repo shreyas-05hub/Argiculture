@@ -134,7 +134,7 @@ const Navbar = () => {
               </Link>
               <div
                 onClick={handleLogout}
-                className="btn btn-success d-flex align-items-center gap-2 px-3 py-1 "
+                className="btn btn-success d-flex align-items-center gap-2 px-2 py-1 "
                 style={{ borderRadius: "8px" }}
               >
                 <i className="bi bi-box-arrow-right fs-5"></i> 
