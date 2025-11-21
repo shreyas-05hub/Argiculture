@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -9,9 +10,8 @@ const Contact = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  // const [toast, setToast] = useState({ type: "", message: "" });
 
-  // Auto-fill if logged in user exists
+  // Auto-fill logged in user info
   useEffect(() => {
     const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
@@ -32,7 +32,6 @@ const Contact = () => {
 
     const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
-    // 🚫 Condition: If user is not logged in → block submission
     if (!loggedUser) {
       toast.info("⚠️ You must be logged in to send a message.");
       return;
@@ -44,7 +43,11 @@ const Contact = () => {
       const res = await fetch("http://127.0.0.1:8000/contact/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          user_id: loggedUser.id,     // Send user ID
+          role: loggedUser.role,      // Send role
+        }),
       });
 
       const data = await res.json();
@@ -58,10 +61,10 @@ const Contact = () => {
           message: "",
         });
       } else {
-        toast.error(data.error || "Something went wrong.");
+        toast.error(data.error || "Something went wrong!");
       }
     } catch (error) {
-      toast.error("❌ Server not responding.");
+      toast.error("❌ Server not responding!");
     }
 
     setLoading(false);
@@ -69,20 +72,6 @@ const Contact = () => {
 
   return (
     <div>
-      {/* TOAST NOTIFICATION */}
-      {toast.message && (
-        <div
-          className={`toast align-items-center text-white position-fixed top-0 end-0 m-3 show ${
-            toast.type === "success" ? "bg-success" : "bg-danger"
-          }`}
-          role="alert"
-        >
-          <div className="d-flex">
-            <div className="toast-body fw-semibold">{toast.message}</div>
-          </div>
-        </div>
-      )}
-
       {/* ===== Banner Section ===== */}
       <section
         className="text-center text-white d-flex align-items-center justify-content-center position-relative"
@@ -105,11 +94,12 @@ const Contact = () => {
         </div>
       </section>
 
-      {/* ===== Contact Section ===== */}
+      {/* ===== Contact Form Section ===== */}
       <section className="py-5 bg-light">
         <div className="container">
           <div className="row g-4 shadow-lg p-4 rounded bg-white">
-            {/* Left: Contact Form */}
+
+            {/* Contact Form */}
             <div className="col-lg-6">
               <h2 className="fw-bold mb-3 text-success">Get In Touch</h2>
               <p className="text-muted mb-4">
@@ -125,11 +115,8 @@ const Contact = () => {
                     className="form-control"
                     name="name"
                     value={formData.name}
-                    onChange={handleChange}
-                    placeholder="Enter your name"
                     disabled
                   />
-                  <small className="text-muted">Auto-filled after login</small>
                 </div>
 
                 {/* Email */}
@@ -140,11 +127,8 @@ const Contact = () => {
                     className="form-control"
                     name="email"
                     value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Enter your email"
                     disabled
                   />
-                  <small className="text-muted">Auto-filled after login</small>
                 </div>
 
                 {/* Subject */}
@@ -156,7 +140,6 @@ const Contact = () => {
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
-                    placeholder="Enter the subject"
                     required
                   />
                 </div>
@@ -170,30 +153,21 @@ const Contact = () => {
                     rows="5"
                     value={formData.message}
                     onChange={handleChange}
-                    placeholder="Type your message..."
                     required
                   ></textarea>
                 </div>
 
-                {/* Submit Button */}
                 <button
-                  type="submit"
                   className="btn btn-success px-4 fw-semibold"
+                  type="submit"
                   disabled={loading}
                 >
-                  {loading ? (
-                    <div
-                      className="spinner-border spinner-border-sm me-2"
-                      role="status"
-                    ></div>
-                  ) : (
-                    "Send Message"
-                  )}
+                  {loading ? "Sending..." : "Send Message"}
                 </button>
               </form>
             </div>
 
-            {/* Right: Info + Map */}
+            {/* Right Section */}
             <div className="col-lg-6 text-center">
               <h4 className="fw-bold text-success mb-4">Reach Us</h4>
               <p className="mb-2 fw-semibold">Social Prachar Office</p>
@@ -203,9 +177,15 @@ const Contact = () => {
               <p className="mb-4">✉️ support@agribuyai.in</p>
 
               <div className="ratio ratio-4x3 border rounded shadow-sm">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15220.125134707886!2d78.3975765!3d17.49508545!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b97b6928e4e11e5%3A0xf670d8a599b58402!2sBhagya%20Nagar%20Colony%2C%20Kukatpally%2C%20Hyderabad%2C%20Telangana!5e0!3m2!1sen!2sin!4v1700466453673!5m2!1sen!2sin" title="Google Map" allowFullScreen loading="lazy" style={{ border: 0, borderRadius: "10px" }} ></iframe>
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18..."
+                  allowFullScreen
+                  loading="lazy"
+                  style={{ border: 0, borderRadius: "10px" }}
+                ></iframe>
               </div>
             </div>
+
           </div>
         </div>
       </section>
