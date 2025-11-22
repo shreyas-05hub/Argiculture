@@ -1,326 +1,235 @@
-import React, { useState, useCallback } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Tab,
-  Nav,
-  Form,
-  Button,
-} from "react-bootstrap";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import Cropper from "react-easy-crop";
-import getCroppedImg from "./cropImage";
-import "./UserProfile.css";
+import React, { useState, useEffect } from "react";
+import { Card, Row, Col, Form, Button } from "react-bootstrap";
+import axios from "axios";
 
 const UserProfile = () => {
-  // ---- Load real logged-in user ----
-  const loggedIn = JSON.parse(localStorage.getItem("loggedInUser"));
-  const allUsers = JSON.parse(localStorage.getItem("users")) || [];
+  const storedUser = JSON.parse(localStorage.getItem("loggedInUser")) || {};
+  const userId = storedUser.id;
 
-  const realUser = allUsers.find((u) => u.email === loggedIn?.email);
+  const [editAll, setEditAll] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
 
-  // ---- Initial User State ----
   const [user, setUser] = useState({
-    name: realUser?.username || "Unknown",
-    contact: realUser?.phone || realUser?.email || "",
-    address: realUser?.address || "",
-    profilePic: realUser?.profilePic || null,
-    role: realUser?.role || "",
-    acres: realUser?.acres || "",
-    experience: realUser?.experience || "",
+    firstName: "",
+    lastName: "",
+    contact: "",
+    address: "",
+    email: "",
+    profilePic: "",
   });
 
-  // ----- Combined Edit Mode -----
-  const [editAll, setEditAll] = useState(false);
-  const [tempUser, setTempUser] = useState({ ...user });
+  useEffect(() => {
+    setUser({
+      firstName: storedUser.first_name || "",
+      lastName: storedUser.last_name || "",
+      contact: storedUser.mobile_no || "",
+      address: storedUser.address || "",
+      email: storedUser.email || "",
+      profilePic: storedUser.profile_picture || "",
+    });
+  }, []);
 
-  const startEditAll = () => {
-    setTempUser({ ...user });
-    setEditAll(true);
+  // ---------------- IMAGE CHANGE ----------------
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setSelectedImageFile(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setUser((prev) => ({
+        ...prev,
+        profilePic: reader.result,
+      }));
+    };
+
+    reader.readAsDataURL(file);
   };
 
-  const cancelEditAll = () => {
-    setUser({ ...tempUser });
-    setEditAll(false);
-  };
-
-  const saveEditAll = () => {
-    updateLocalStorage(user);
-    setEditAll(false);
-  };
-
+  // ---------------- INPUT TEXT CHANGE ----------------
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  // ---- Update localStorage ----
-  const updateLocalStorage = (updatedUser) => {
-    const updatedUsers = allUsers.map((u) =>
-      u.email === loggedIn.email
-        ? {
-            ...u,
-            username: updatedUser.name,
-            phone: updatedUser.contact,
-            address: updatedUser.address,
-            profilePic: updatedUser.profilePic,
-            acres: updatedUser.acres,
-            experience: updatedUser.experience,
-          }
-        : u
-    );
-
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-  };
-
-  // ---- IMAGE CROPPING ----
-  const [imageSrc, setImageSrc] = useState(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [showCropper, setShowCropper] = useState(false);
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImageSrc(reader.result);
-      setShowCropper(true);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const onCropComplete = useCallback((croppedArea, croppedPixels) => {
-    setCroppedAreaPixels(croppedPixels);
-  }, []);
-
-  const saveCroppedImage = async () => {
+  // ---------------- SAVE PROFILE ----------------
+  const handleSave = async () => {
     try {
-      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
-      const updatedUser = { ...user, profilePic: croppedImage };
-      setUser(updatedUser);
-      updateLocalStorage(updatedUser);
-      setShowCropper(false);
+      const formData = new FormData();
+      formData.append("first_name", user.firstName);
+      formData.append("last_name", user.lastName);
+      formData.append("mobile_no", user.contact);
+      formData.append("address", user.address);
+
+      // Only send image if user selected new one
+      if (selectedImageFile) {
+        formData.append("profile_picture", selectedImageFile);
+      }
+
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/update-profile/${userId}/`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      const updatedPic = response.data.profile_picture;
+
+      // Update localStorage
+      let updatedUser = {
+        ...storedUser,
+        first_name: user.firstName,
+        last_name: user.lastName,
+        mobile_no: user.contact,
+        address: user.address,
+        profile_picture: updatedPic,
+      };
+
+      localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
+
+      // Update UI
+      setUser((prev) => ({
+        ...prev,
+        profilePic: updatedPic,
+      }));
+
+      alert("Profile Updated Successfully!");
+      setEditAll(false);
     } catch (error) {
-      console.error(error);
+      console.error("Update Error", error);
+      alert("Update failed");
     }
   };
-
-  const removeImage = () => {
-    const updatedUser = { ...user, profilePic: null };
-    setUser(updatedUser);
-    updateLocalStorage(updatedUser);
-  };
-
+  console.log("USER PROFILE RENDER", user);
   return (
-    <Container className="profile-container mt-5 mb-5">
-      <Card className="shadow-lg border-0 profile-card p-4">
+    <div className="container mt-4">
+      <Card className="p-4 shadow-sm">
+        <h3 className="mb-3">User Profile</h3>
+
         <Row>
-          {/* LEFT SIDE */}
-          <Col
-            md={4}
-            className="text-center border-end d-flex flex-column align-items-center justify-content-center"
-          >
-            <img
-              src={
-                user.profilePic ||
-                `https://ui-avatars.com/api/?name=${user.name}&background=0D8ABC&color=fff`
-              }
-              alt="User"
-              className="profile-pic mb-3"
-            />
+          <Col md={4} className="text-center">
+            <div className="mb-3">
+              {user.profilePic ? (
+               <img
+  src={
+    user.profilePic
+      ? user.profilePic.startsWith("http")
+        ? user.profilePic
+        : `http://127.0.0.1:8000${user.profilePic}`
+      : null
+  }
+  alt="Profile"
+  style={{
+    width: "150px",
+    height: "150px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    border: "2px solid #ccc",
+  }}
+/>
 
-            <label className="btn btn-sm btn-primary mt-2">
-              Upload Image
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                hidden
-              />
-            </label>
+              ) : (
+                <div
+                  style={{
+                    width: "150px",
+                    height: "150px",
+                    borderRadius: "50%",
+                    background: "#eee",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "2px solid #ccc",
+                  }}
+                >
+                  No Image
+                </div>
+              )}
+            </div>
 
-            {user.profilePic && (
-              <button
-                className="btn btn-sm btn-outline-danger mt-2"
-                onClick={removeImage}
-              >
-                <FaTrash /> Remove
-              </button>
+            {editAll && (
+              <input type="file" accept="image/*" onChange={handleImageChange} />
             )}
-
-            <h5 className="text-muted mt-3">{user.name}</h5>
-            <h6 className="text-secondary">{user.role}</h6>
           </Col>
 
-          {/* RIGHT SIDE */}
-          <Col md={8} className="p-4">
-            <Tab.Container defaultActiveKey="profile">
-              <Nav variant="tabs" className="mb-3">
-                <Nav.Item>
-                  <Nav.Link eventKey="profile">Profile Info</Nav.Link>
-                </Nav.Item>
-              </Nav>
+          <Col md={8}>
+            <Form>
+              <Row>
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>First Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="firstName"
+                      value={user.firstName}
+                      onChange={handleChange}
+                      disabled={!editAll}
+                    />
+                  </Form.Group>
+                </Col>
 
-              {/* Edit Buttons */}
-              <div className="d-flex justify-content-end mb-3">
-                {!editAll ? (
-                  <Button variant="warning" onClick={startEditAll}>
-                    <FaEdit /> Edit All
+                <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Last Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="lastName"
+                      value={user.lastName}
+                      onChange={handleChange}
+                      disabled={!editAll}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Email</Form.Label>
+                <Form.Control type="text" value={user.email} disabled />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Contact</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="contact"
+                  value={user.contact}
+                  onChange={handleChange}
+                  disabled={!editAll}
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Address</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="address"
+                  value={user.address}
+                  onChange={handleChange}
+                  disabled={!editAll}
+                />
+              </Form.Group>
+
+              {!editAll ? (
+                <Button variant="primary" onClick={() => setEditAll(true)}>
+                  Edit All
+                </Button>
+              ) : (
+                <div>
+                  <Button variant="success" onClick={handleSave}>
+                    Save All
                   </Button>
-                ) : (
-                  <>
-                    <Button
-                      className="me-2"
-                      variant="success"
-                      onClick={saveEditAll}
-                    >
-                      Save All
-                    </Button>
-                    <Button variant="danger" onClick={cancelEditAll}>
-                      Cancel
-                    </Button>
-                  </>
-                )}
-              </div>
-
-              <Tab.Content>
-                <Tab.Pane eventKey="profile">
-                  <div className="user-info">
-                    {/* NAME */}
-                    <div className="info-item mt-3">
-                      <h6>Name:</h6>
-                      {editAll ? (
-                        <Form.Control
-                          type="text"
-                          name="name"
-                          value={user.name}
-                          onChange={handleChange}
-                        />
-                      ) : (
-                        <h5>{user.name}</h5>
-                      )}
-                    </div>
-
-                    {/* CONTACT */}
-                    <div className="info-item mt-4">
-                      <h6>Contact:</h6>
-                      {editAll ? (
-                        <Form.Control
-                          type="text"
-                          name="contact"
-                          value={user.contact}
-                          onChange={handleChange}
-                        />
-                      ) : (
-                        <h6>{user.contact}</h6>
-                      )}
-                    </div>
-
-                    {/* ADDRESS */}
-                    <div className="info-item mt-4">
-                      <h6>Address:</h6>
-                      {editAll ? (
-                        <Form.Control
-                          type="text"
-                          name="address"
-                          value={user.address}
-                          onChange={handleChange}
-                        />
-                      ) : (
-                        <h6>{user.address || "No address added"}</h6>
-                      )}
-                    </div>
-
-                    {/* ROLE */}
-                    <div className="info-item mt-4">
-                      <h6>Role:</h6>
-                      <h6>{user.role}</h6>
-                    </div>
-
-                    {/* ------------ ROLE BASED FIELDS ------------ */}
-
-                    {/* FARMER FIELDS ONLY */}
-                    {user.role === "farmer" && (
-                      <>
-                        <div className="info-item mt-3">
-                          <Form.Label>Land Acres</Form.Label>
-                          {editAll ? (
-                            <Form.Control
-                              name="acres"
-                              value={user.acres}
-                              onChange={handleChange}
-                            />
-                          ) : (
-                            <h6>{user.acres || "Not provided"}</h6>
-                          )}
-                        </div>
-
-                        <div className="info-item mt-3">
-                          <Form.Label>Experience (Years)</Form.Label>
-                          {editAll ? (
-                            <Form.Control
-                              name="experience"
-                              value={user.experience}
-                              onChange={handleChange}
-                            />
-                          ) : (
-                            <h6>{user.experience || "Not provided"}</h6>
-                          )}
-                        </div>
-                      </>
-                    )}
-
-                    {/* BUYER FIELDS (You can add more later) */}
-                    {user.role === "buyer" && (
-                      <>
-                        <div className="info-item mt-3">
-                          <h6>Buyer Profile</h6>
-                          <p>
-                            You can add buyer fields here (GST, Company Name...)
-                          </p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </Tab.Pane>
-              </Tab.Content>
-            </Tab.Container>
+                  <Button
+                    variant="secondary"
+                    className="ms-2"
+                    onClick={() => setEditAll(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              )}
+            </Form>
           </Col>
         </Row>
-      </Card>
-
-      {/* IMAGE CROPPER MODAL */}
-      {showCropper && (
-        <div className="cropper-modal">
-          <div className="cropper-box">
-            <Cropper
-              image={imageSrc}
-              crop={crop}
-              zoom={zoom}
-              aspect={1}
-              cropShape="round"
-              showGrid={false}
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={onCropComplete}
-            />
-
-            <div className="crop-controls">
-              <Button variant="success" onClick={saveCroppedImage}>
-                Save
-              </Button>
-
-              <Button variant="danger" onClick={() => setShowCropper(false)}>
-                Cancel
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </Container>
+      </Card> 
+    </div>
   );
 };
 

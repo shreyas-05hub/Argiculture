@@ -1,24 +1,37 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import axios from "axios";
 import "../styles/AdminDash.css";
 import AdminLayout from "./AdminLayout";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
-  // const [showSidebar, setShowSidebar] = useState(false);
 
+  // Fetch users from backend
   useEffect(() => {
-    const storedUsers = JSON.parse(localStorage.getItem("users")) || [];
-    setUsers(storedUsers);
+    axios
+      .get("http://127.0.0.1:8000/api/users/")
+      .then((res) => {
+        // Filter only farmers + endusers (exclude admin)
+        const filtered = res.data.filter(
+          (u) => u.role === "farmer" || u.role === "enduser"
+        );
+        setUsers(filtered);
+      })
+      .catch((err) => console.log("Error fetching users:", err));
   }, []);
 
-  const removeUser = (index) => {
-    const updated = [...users];
-    updated.splice(index, 1);
-    setUsers(updated);
-    localStorage.setItem("users", JSON.stringify(updated));
+  // Delete user
+  const removeUser = (id) => {
+    axios
+      .delete(`http://127.0.0.1:8000/api/users/${id}/`)
+      .then(() => {
+        const updated = users.filter((u) => u.id !== id);
+        setUsers(updated);
+      })
+      .catch((err) => console.log("Error deleting user:", err));
   };
 
+  // Count Roles
   const totalFarmers = users.filter((u) => u.role === "farmer").length;
   const totalTraders = users.filter((u) => u.role === "enduser").length;
 
@@ -26,46 +39,8 @@ const UserManagement = () => {
     <AdminLayout>
       <div className="admin-dashboard container-fluid">
         <div className="row">
-          {/* Sidebar */}
-          {/* <div className={`col-md-3 sidebar ${showSidebar ? "active" : ""}`}>
-          <button
-            className="close-btn d-md-none"
-            onClick={() => setShowSidebar(false)}
-          >
-            X
-          </button>
-
-          <h3 className="admin-title">Admin Panel</h3>
-
-          <ul className="list-group">
-            <Link to="/dashboard" className="list-group-item">
-              Dashboard Overview
-            </Link>
-
-            <Link to="/usermanagement" className="list-group-item">
-              User Management
-            </Link>
-
-            <Link to="/reports" className="list-group-item">
-              Reports
-            </Link>
-
-            <Link to="/settings" className="list-group-item">
-              Settings
-            </Link>
-          </ul>
-        </div> */}
-
           {/* Main Content */}
           <div className="col-md-12 content">
-            {/* Mobile Menu Toggle */}
-            {/* <button
-              className="btn btn-outline-success d-md-none mb-3"
-              onClick={() => setShowSidebar(!showSidebar)}
-            >
-              {showSidebar ? "Hide Menu" : "☰ Menu"}
-            </button> */}
-
             <h2>Welcome, Admin 👨‍💼</h2>
 
             {/* Statistics */}
@@ -112,22 +87,16 @@ const UserManagement = () => {
                   <tbody>
                     {users.length > 0 ? (
                       users.map((u, index) => (
-                        <tr key={index}>
+                        <tr key={u.id}>
                           <td>{index + 1}</td>
-
-                          {/* FIXED: username */}
                           <td>{u.username}</td>
-
                           <td>{u.role}</td>
                           <td>{u.email}</td>
-
-                          {/* FIXED: location → address */}
                           <td>{u.address || "—"}</td>
-
                           <td>
                             <button
                               className="btn btn-danger btn-sm"
-                              onClick={() => removeUser(index)}
+                              onClick={() => removeUser(u.id)}
                             >
                               Remove
                             </button>

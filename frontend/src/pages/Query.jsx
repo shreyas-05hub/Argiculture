@@ -38,7 +38,7 @@ const Query = () => {
                       <td>{q.email}</td>
                       <td>{q.subject}</td>
                       <td>{q.message}</td>
-                      <td>{q.user_role}</td>
+                      <td>{q.role}</td>
                     </tr>
                   ))
                 ) : (
