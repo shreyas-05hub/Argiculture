@@ -15,7 +15,6 @@ import Login from './components/auth/Login'
 import Signup from './components/auth/Signup'
 import UserProfile from './pages/UserProfile'
 import UserManagement from './pages/UserManagement'
-import Settings from './pages/Settings'
 import Reports from './pages/Reports'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminDashboard from './components/AdminDashboard'
@@ -81,7 +80,6 @@ const App = () => {
         <Route path='/profile' element={<UserProfile/>}/>
         <Route path='/orders' element={<Orders/>}/>
         <Route path='/usermanagement' element={<UserManagement/>}/>
-        <Route path='/settings' element={<Settings/>}/>
         <Route path='/reports' element={<Reports/>}/>
         <Route path='/query' element={<Query/>}/>
       </Routes>

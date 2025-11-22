@@ -105,7 +105,12 @@ export default function AboutUs() {
   ];
 
   return (
-    <main className=" bg-light text-dark">
+    <main
+      className=" bg-light text-dark"
+      style={{
+        background: "linear-gradient(to right, #80f57cff,  #428742ff)",
+      }}
+    >
       {/* Hero Section */}
       <section className="first-section p-5 bg-success text-white align-item-center">
         <motion.div
@@ -138,7 +143,7 @@ export default function AboutUs() {
       <section id="features" className="py-5">
         <div className="container text-center">
           <h2 className="fw-bold mb-4">Our Key Features</h2>
-          <p className="text-secondary mb-5">
+          <p className=" mb-5 fw-bold">
             Advanced AI and IoT-based solutions that transform agriculture into
             a data-driven, transparent industry.
           </p>
@@ -169,13 +174,13 @@ export default function AboutUs() {
         <div className="container">
           <div className="row align-items-center g-5">
             <div className="col-lg-6">
-              <h2 className="fw-semibold mb-3">Our Mission</h2>
-              <p className="text-secondary">
+              <h2 className="fw-bold mb-3">Our Mission</h2>
+              <p className="fw-bold">
                 To empower every farmer with smart AI tools that enhance yield,
                 reduce costs, and open direct access to profitable markets.
               </p>
-              <h3 className="fw-semibold mt-4 mb-3">Our Vision</h3>
-              <p className="text-secondary">
+              <h3 className="fw-bold mt-4 mb-3">Our Vision</h3>
+              <p className="fw-bold">
                 To build a future-ready agricultural ecosystem where technology
                 and trust drive sustainability and growth.
               </p>
@@ -206,7 +211,13 @@ export default function AboutUs() {
       </section>
 
       {/* Team Section */}
-      <section id="team" className="py-5 bg-light">
+      <section
+        id="team"
+        className="py-5 bg-light"
+        style={{
+          background: "linear-gradient(to right, #80f57cff,  #428742ff)",
+        }}
+      >
         <div className="container text-center">
           <h2 className="fw-bold mb-5">Meet Our Team</h2>
           <div className="row g-4 justify-content-center">

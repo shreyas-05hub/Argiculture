@@ -1,7 +1,7 @@
 /* Smooth Green Underline Animation */
 .animated-link {
   position: relative;
-  padding-bottom: 5px;
+ 
 }
 
 .animated-link::after {

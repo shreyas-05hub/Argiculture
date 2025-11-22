@@ -36,9 +36,6 @@ const AdminLayout = ({ children }) => {
               Queries
             </Link>
 
-            <Link to="/settings" className="list-group-item">
-              Settings
-            </Link>
           </ul>
         </div>
 

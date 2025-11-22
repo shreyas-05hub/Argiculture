@@ -8,8 +8,8 @@
 /* ---------------- HERO SECTION ---------------- */
 .hero-section {
     background: linear-gradient(rgba(1, 57, 1, 0.65), rgba(1, 78, 1, 0.65)),
-        url("https://t3.ftcdn.net/jpg/03/40/70/04/360_F_340700428_AquH6hbzeMOYLQ6g6kfWAMuUvfw60Zd1.jpg") center/cover no-repeat;
-    height: 100vh;
+        url("../assets/home-section.gif") center/cover no-repeat;
+    height: 80vh;
     color: white;
     display: flex;
     align-items: center;

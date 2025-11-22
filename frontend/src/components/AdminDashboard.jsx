@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import "../styles/AdminDash.css";
 import AdminLayout from "./AdminLayout";
 
-const AdminDashboard = () => {
+const UserManagement = () => {
   const [users, setUsers] = useState([]);
   // const [showSidebar, setShowSidebar] = useState(false);
 
@@ -152,4 +152,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default UserManagement;
