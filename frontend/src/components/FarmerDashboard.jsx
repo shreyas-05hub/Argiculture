@@ -10,12 +10,8 @@ const FarmerDashboard = () => {
   const [showVideo, setShowVideo] = useState(false);
 
   const latestCrop = crops.length > 0 ? crops[crops.length - 1] : null;
-const recentQuantity =
-  crops.length > 0 ? Number(crops[crops.length - 1].quantity) : 0;
-
-
-
-
+  const recentQuantity =
+    crops.length > 0 ? Number(crops[crops.length - 1].quantity) : 0;
 
   useEffect(() => {
     const logged = JSON.parse(localStorage.getItem("loggedInUser"));
@@ -54,10 +50,36 @@ const recentQuantity =
 
   const handleCropChange = (e) => {
     const { name, value, files } = e.target;
-    setFormData({
-      ...formData,
-      [name]: files ? URL.createObjectURL(files[0]) : value,
-    });
+
+    if (name === "image") {
+      let newFiles = Array.from(files);
+
+      // LIMIT TO 5 IMAGES
+      if (newFiles.length > 5) {
+        alert("You can upload a maximum of 5 images.");
+        return;
+      }
+
+      // VALIDATE FORMATS
+      const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
+      for (let file of newFiles) {
+        if (!allowedTypes.includes(file.type)) {
+          alert("Only JPG, JPEG, and PNG images are allowed.");
+          return;
+        }
+      }
+
+      // Save actual files (NOT preview URLs)
+      setFormData((prev) => ({
+        ...prev,
+        image: newFiles,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const saveCropsToStorage = (allCrops) => {
@@ -72,10 +94,10 @@ const recentQuantity =
   const handleAdd = () => {
     const newCrop = {
       id: Date.now(),
-      farmerName: formData.farmerName,
+      // farmerName: formData.farmerName,
       cropName: formData.cropName,
       quantity: formData.quantity,
-      price: formData.price,
+      // price: formData.price,
       location: formData.location,
       description: formData.description,
       image: formData.image,
@@ -163,7 +185,7 @@ const recentQuantity =
         className="container-fluid p-5 mt-4 mb-4"
         style={{
           background: "linear-gradient(to right, #80f57cff,  #428742ff)",
-          
+
           borderRadius: "0 0 20px 20px",
         }}
       >
@@ -276,19 +298,21 @@ const recentQuantity =
         <div className="card p-3 mt-4 shadow-sm">
           <h5>Add New Crop</h5>
 
-          <input
+          {/* <input
             type="text"
             name="farmerName"
             placeholder="Farmer Name"
             className="form-control mb-2"
             value={formData.farmerName}
             onChange={handleCropChange}
-          />
+          /> */}
 
           <input
             type="file"
             name="image"
             className="form-control mb-2"
+            accept=".jpg,.jpeg,.png"
+            multiple
             onChange={handleCropChange}
           />
 
@@ -319,14 +343,14 @@ const recentQuantity =
             onChange={handleCropChange}
           />
 
-          <input
+          {/* <input
             type="number"
             name="price"
             placeholder="Price (₹)"
             className="form-control mb-2"
             value={formData.price}
             onChange={handleCropChange}
-          />
+          /> */}
 
           <textarea
             name="description"
