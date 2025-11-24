@@ -1,89 +1,229 @@
-.profile-container {
-  max-width: 900px;
+/* ---------------------------
+   FULL PAGE BACKGROUND + OVERLAY
+------------------------------*/
+.user-profile-page {
+  background: url("/mnt/data/56669892-989c-4f6a-88da-8839cd78cc5f.png") 
+    no-repeat center center/cover;
+  min-height: 100vh;
+  padding: 40px 0;
+  position: relative;
+  overflow-x: hidden;
+  animation: fadePage 1.2s ease;
 }
 
-.profile-card {
-  border-radius: 20px;
-  transition: transform 0.3s ease;
-}
-
-.profile-card:hover {
-  transform: scale(1.01);
-}
-
-.profile-pic {
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid #6c63ff;
-  transition: transform 0.3s ease;
-}
-
-.profile-pic:hover {
-  transform: rotate(5deg) scale(1.05);
-}
-
-.edit-icon {
-  color: #6c63ff;
-  cursor: pointer;
-  margin-left: 8px;
-  transition: color 0.3s ease;
-}
-
-.edit-icon:hover {
-  color: #4b47d0;
-}
-
-.nav-tabs .nav-link.active {
-  background-color: #6c63ff !important;
-  color: white !important;
-  border-radius: 10px 10px 0 0;
-}
-
-.order-list {
-  list-style: none;
-  padding-left: 0;
-}
-
-.order-list li {
-  background: #f7f7f7;
-  border-radius: 10px;
-  padding: 10px;
-  margin-bottom: 8px;
-  transition: transform 0.2s ease;
-}
-
-.order-list li:hover {
-  transform: translateX(5px);
-  background: #ebe9ff;
-}
-
-/* CROP MODAL */
-.cropper-modal {
-  position: fixed;
+.user-profile-page::before {
+  content: "";
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
+  background: rgba(0,0,0,0.45);
+  background-image: url("https://cdn-icons-png.flaticon.com/512/4150/4150853.png");
+  background-size: 90px;
+  background-repeat: repeat;
+  opacity: 0.09;
+  animation: floatBackground 25s linear infinite;
+  z-index: 0;
 }
 
-.cropper-box {
-  width: 350px;
-  height: 420px;
-  background: white;
-  border-radius: 15px;
-  padding: 15px;
+@keyframes floatBackground {
+  from { background-position: 0 0; }
+  to   { background-position: 0 600px; }
+}
+
+@keyframes fadePage {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------------------------
+   TOP PROFILE HEADER (GLASS)
+------------------------------*/
+.profile-header {
+  position: relative;
+  z-index: 2;
+  width: 85%;
+  margin: auto;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(14px);
+  border-radius: 25px;
+  padding: 35px;
+  border-left: 6px solid #198754;
+  border-right: 6px solid #198754;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.35);
+  animation: slideDown 1s ease forwards;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.profile-header-content {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+/* ---------------------------
+   PROFILE IMAGE
+------------------------------*/
+.profile-image-wrapper {
   position: relative;
 }
 
-.crop-controls {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
+.profile-image {
+  width: 125px;
+  height: 125px;
+  border-radius: 50%;
+  border: 5px solid #198754;
+  object-fit: cover;
+  transition: 0.4s ease;
+  box-shadow: 0 0 20px #19875470;
+}
+
+.profile-image:hover {
+  transform: scale(1.07);
+}
+
+.image-upload-btn {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: #198754;
+  padding: 6px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #fff;
+  border: 2px solid white;
+  font-size: 18px;
+}
+
+.image-upload-btn input {
+  display: none;
+}
+
+/* ---------------------------
+   HEADER TEXT
+------------------------------*/
+.profile-name {
+  font-size: 32px;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 0 10px #000;
+}
+
+.profile-email {
+  font-size: 16px;
+  color: #e9e9e9;
+}
+
+.profile-role {
+  font-size: 18px;
+  font-weight: bold;
+  color: #bfffc5;
+}
+
+/* ---------------------------
+   INFO CARD (GLASS MORPH)
+------------------------------*/
+.profile-card {
+  width: 85%;
+  margin: auto;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  padding: 30px;
+  border-left: 5px solid #198754;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  animation: slideUp 1s ease forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.profile-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #185e2e;
+  margin-bottom: 20px;
+}
+
+.section-divider {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #198754, transparent);
+  margin-bottom: 20px;
+  animation: glowLine 2s infinite alternate;
+}
+
+@keyframes glowLine {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+
+/* ---------------------------
+   INPUT ANIMATION
+------------------------------*/
+.form-control,
+.form-select {
+  transition: 0.25s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #198754 !important;
+  box-shadow: 0 0 10px #19875470 !important;
+}
+
+/* ---------------------------
+   ICON HOVER
+------------------------------*/
+.edit-icon {
+  cursor: pointer;
+  margin-left: 8px;
+  transition: 0.3s ease;
+}
+
+.edit-icon:hover {
+  transform: scale(1.25);
+  color: #198754;
+}
+
+/* ---------------------------
+   BUTTONS
+------------------------------*/
+.edit-btn,
+.save-btn,
+.cancel-btn {
+  padding: 10px 25px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.save-btn {
+  background: #198754;
+  border: none;
+  color: #fff;
+  transition: 0.3s;
+}
+
+.save-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px #19875480;
+}
+
+.cancel-btn {
+  background: #555;
+  color: #fff;
+  border: none;
+}
+
+.edit-btn {
+  background: #198754;
+  border: none;
+  color: white;
 }
