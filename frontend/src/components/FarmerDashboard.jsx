@@ -10,11 +10,7 @@ const FarmerDashboard = () => {
   const [showVideo, setShowVideo] = useState(false);
 
   const latestCrop = crops.length > 0 ? crops[crops.length - 1] : null;
-const recentQuantity =
-  crops.length > 0 ? Number(crops[crops.length - 1].quantity) : 0;
-
-
-
+  const recentQuantity = crops.length > 0 ? Number(crops[crops.length - 1].quantity) : 0;
 
 
   useEffect(() => {
@@ -155,7 +151,9 @@ const recentQuantity =
     <div
       className="container-fluid mt-4 mb-4 "
       style={{
-        background: "linear-gradient(to right, #80f57cff,  #428742ff)",
+        background: " #b3e6b1",
+        background:
+          "linear-gradient(90deg, rgba(179, 230, 177, 1) 0%, rgba(179, 230, 177, 1) 88%)",
       }}
     >
       {/* HERO SECTION */}
@@ -163,7 +161,7 @@ const recentQuantity =
         className="container-fluid p-5 mt-4 mb-4"
         style={{
           background: "linear-gradient(to right, #80f57cff,  #428742ff)",
-          
+
           borderRadius: "0 0 20px 20px",
         }}
       >
@@ -448,7 +446,7 @@ const recentQuantity =
       </div>
 
       {/* PREVIOUS / NEWLY ADDED CROPS */}
-      <div className="mt-4 mb-4">
+      <div className="mt-4 mb-4 p-5">
         <h5>{showPrevious ? "Previous Crops" : "Newly Added Crops"}</h5>
         <div className="row">
           {showPrevious

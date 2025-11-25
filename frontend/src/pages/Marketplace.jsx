@@ -19,7 +19,14 @@ const Marketplace = () => {
   const removeFromCart = (id) => setCart(cart.filter((item) => item.id !== id));
 
   return (
-    <div className="container py-4">
+    <div
+      className="container-fluid py-4"
+      style={{
+        background: " #b3e6b1",
+        background:
+          "linear-gradient(90deg, rgba(179, 230, 177, 1) 0%, rgba(179, 230, 177, 1) 88%)",
+      }}
+    >
       {/* --- Header --- */}
       <div className="text-center mb-4">
         <h2 className="fw-bold text-success">AgriBuy Marketplace</h2>
@@ -146,7 +153,10 @@ const Marketplace = () => {
             <p className="text-muted">Your cart is empty.</p>
           ) : (
             cart.map((item) => (
-              <div key={item.id} className="d-flex justify-content-between mb-3">
+              <div
+                key={item.id}
+                className="d-flex justify-content-between mb-3"
+              >
                 <div>
                   <p className="mb-0 fw-bold">{item.name}</p>
                   <small className="text-muted">₹{item.price}</small>

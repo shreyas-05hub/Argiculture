@@ -6,7 +6,7 @@ const AdminLayout = ({ children }) => {
   const [showSidebar, setShowSidebar] = useState(false);
 
   return (
-    <div className="admin-dashboard container-fluid">
+    <div className=" container-fluid">
       <div className="row">
         {/* Sidebar */}
         <div className={`col-md-3 sidebar ${showSidebar ? "active" : ""}`}>
@@ -24,18 +24,17 @@ const AdminLayout = ({ children }) => {
               Dashboard Overview
             </Link>
 
-            <Link to="/usermanagement" className="list-group-item">
+            <Link to="/marketmanagement" className="list-group-item">
               Market Management
-            </Link>
-
-            <Link to="/reports" className="list-group-item">
-              Reports
             </Link>
 
             <Link to="/query" className="list-group-item">
               Queries
             </Link>
 
+            <Link to="/reports" className="list-group-item">
+              Reports
+            </Link>
           </ul>
         </div>
 

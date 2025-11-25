@@ -13,7 +13,14 @@ const Query = () => {
 
   return (
     <AdminLayout>
-      <div className="container mt-4" style={{ height: "100vh" }}>
+      <div
+        className="container mt-4"
+        style={{ height: "100vh",
+          background: " #b3e6b1",
+          background:
+            "linear-gradient(90deg, rgba(179, 230, 177, 1) 0%, rgba(179, 230, 177, 1) 88%)",
+        }}
+      >
         <h2>Query Management</h2>
 
         <div className="user-table mt-3">

@@ -80,7 +80,7 @@ const App = () => {
             </ProtectedRoute>}/>        
         <Route path='/profile' element={<UserProfile/>}/>
         <Route path='/orders' element={<Orders/>}/>
-        <Route path='/usermanagement' element={<MarketManagement/>}/>
+        <Route path='/marketmanagement' element={<MarketManagement/>}/>
         <Route path='/reports' element={<Reports/>}/>
         <Route path='/query' element={<Query/>}/>
       </Routes>

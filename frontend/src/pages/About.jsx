@@ -108,7 +108,9 @@ export default function AboutUs() {
     <main
       className=" bg-light text-dark"
       style={{
-        background: "linear-gradient(to right, #80f57cff,  #428742ff)",
+        background: " #b3e6b1",
+        background:
+          "linear-gradient(90deg, rgba(179, 230, 177, 1) 0%, rgba(179, 230, 177, 1) 88%)",
       }}
     >
       {/* Hero Section */}

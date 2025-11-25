@@ -40,7 +40,14 @@ const UserManagement = () => {
       <div className="admin-dashboard container-fluid">
         <div className="row">
           {/* Main Content */}
-          <div className="col-md-12 content">
+          <div
+            className="col-md-12 content container-fluid"
+            style={{
+              background: " #b3e6b1",
+              background:
+                "linear-gradient(90deg, rgba(179, 230, 177, 1) 0%, rgba(179, 230, 177, 1) 88%)",
+            }}
+          >
             <h2>Welcome, Admin 👨‍💼</h2>
 
             {/* Statistics */}

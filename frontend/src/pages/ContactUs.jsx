@@ -95,15 +95,22 @@ const Contact = () => {
       </section>
 
       {/* ===== Contact Form Section ===== */}
-      <section className="py-5 bg-light">
+      <section
+        className=" bg-light py-5"
+        style={{
+          background: " #b3e6b1",
+          background:
+            "linear-gradient(90deg, rgba(179, 230, 177, 1) 0%, rgba(179, 230, 177, 1) 88%)",
+        }}
+      >
         <div className="container">
           <div className="row g-4 shadow-lg p-4 rounded bg-white">
-
             {/* Contact Form */}
             <div className="col-lg-6">
               <h2 className="fw-bold mb-3 text-success">Get In Touch</h2>
               <p className="text-muted mb-4">
-                Have questions about our agricultural platform? We’d love to assist you.
+                Have questions about our agricultural platform? We’d love to
+                assist you.
               </p>
 
               <form onSubmit={handleSubmit}>
@@ -176,7 +183,10 @@ const Contact = () => {
               <p className="mb-2">📞 +91-9876543210</p>
               <p className="mb-4">✉️ support@agribuyai.in</p>
 
-              <div className="ratio ratio-4x3 border rounded shadow-sm">
+              <div
+                className="ratio ratio-4x3 border rounded shadow-sm"
+                style={{ height: "300px", overflow: "hidden" }}
+              >
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18..."
                   allowFullScreen
@@ -185,7 +195,6 @@ const Contact = () => {
                 ></iframe>
               </div>
             </div>
-
           </div>
         </div>
       </section>
