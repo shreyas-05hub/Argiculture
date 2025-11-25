@@ -5,7 +5,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { toast } from "react-toastify";
 import "../styles/Navbar.css";
-import { motion } from "framer-motion";
+
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -64,23 +64,6 @@ const Navbar = () => {
           />
           AgriBuy<span className="text-primary">AI</span>
         </Link>
-        {/* Buffalo Cart Animation - Rapido Style */}
-        {/* <motion.img
-          src="/assets/buffalo-cart.png"
-          alt="buffalo-cart"
-          initial={{ x: "-150px", opacity: 0 }}
-          animate={{ x: "1500px", opacity: 1 }}
-          transition={{ duration: 2.5, ease: "easeInOut" }}
-          style={{
-            width: "80px",
-            height: "auto",
-            position: "absolute",
-            top: "10px",
-            left: "0px",
-            pointerEvents: "none", // so it doesn’t block links
-            zIndex: 99999,
-          }}
-        /> */}
 
         {/* Mobile Toggle */}
         <button

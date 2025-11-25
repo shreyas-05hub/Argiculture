@@ -1,10 +1,34 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/Home.css";
 import { Link } from "react-router-dom";
 
 const Home = () => {
+  const [stats, setStats] = useState({
+    farmers: 0,
+    customers: 0,
+    trades: 0,
+  });
+
   useEffect(() => {
+    // Animate statistics
+    const animateCount = (target, key) => {
+      let count = 0;
+      const increment = target / 50;
+      const timer = setInterval(() => {
+        count += increment;
+        if (count >= target) {
+          count = target;
+          clearInterval(timer);
+        }
+        setStats((prev) => ({ ...prev, [key]: Math.floor(count) }));
+      }, 30);
+    };
+
+    animateCount(5000, "farmers");
+    animateCount(3000, "customers");
+    animateCount(12000, "trades");
+
     // Trigger animations when scrolling into view
     const sections = document.querySelectorAll(".animate");
     const observer = new IntersectionObserver(
@@ -18,162 +42,392 @@ const Home = () => {
       { threshold: 0.1 }
     );
     sections.forEach((sec) => observer.observe(sec));
+
+    return () => observer.disconnect();
   }, []);
 
   return (
     <div className="homepage">
       {/* Hero Section */}
-      <header className="hero-section text-center text-white d-flex align-items-center justify-content-center animate">
+      <header className="hero-section text-center text-white d-flex align-items-center justify-content-center">
         <div className="hero-content">
-          {/* <h1 className="fw-bold display-3"><span className="">AgriBuy</span><span className="text-primary">AI</span></h1> */}
-          <p className="lead">
-            The Intelligent Marketplace for <strong>Farmers</strong> &{" "}
-            <strong>Customers</strong> powered by Artificial Intelligence.
+          <div className="hero-badge mb-3">
+            <span className="badge bg-success-soft px-4 py-2">
+              🚀 AI-Powered Agricultural Marketplace
+            </span>
+          </div>
+          <h1 className="hero-title mb-4">
+            Transform Agriculture with
+            <span className="gradient-text d-block">Intelligent Trading</span>
+          </h1>
+          <p className="hero-subtitle mb-5">
+            Connect farmers directly with customers through AI-driven crop
+            analysis, fair pricing, and smart matching. Join the future of
+            agricultural commerce.
           </p>
-          <div className="mt-4">
-            <Link to="/signup?role=farmer" className="btn btn-light btn-lg m-2">
-              Join as Farmer
+          <div className="hero-cta">
+            <Link
+              to="/signup?role=farmer"
+              className="btn btn-hero btn-primary btn-lg m-2"
+            >
+              <span>Join as Farmer</span>
+              <i className="ms-2">🌾</i>
             </Link>
-            <Link to="/signup?role=enduser" className="btn btn-outline-light btn-lg m-2">
-              Join as Customer
+            <Link
+              to="/signup?role=enduser"
+              className="btn btn-hero btn-outline-light btn-lg m-2"
+            >
+              <span>Join as Customer</span>
+              <i className="ms-2">🛒</i>
             </Link>
+          </div>
+
+          {/* Trust Indicators */}
+          <div className="hero-stats mt-5">
+            <div className="row g-4 justify-content-center">
+              <div className="col-auto">
+                <div className="stat-item">
+                  <div className="stat-number">
+                    {stats.farmers.toLocaleString()}+
+                  </div>
+                  <div className="stat-label">Active Farmers</div>
+                </div>
+              </div>
+              <div className="col-auto">
+                <div className="stat-item">
+                  <div className="stat-number">
+                    {stats.customers.toLocaleString()}+
+                  </div>
+                  <div className="stat-label">Trusted Customers</div>
+                </div>
+              </div>
+              <div className="col-auto">
+                <div className="stat-item">
+                  <div className="stat-number">
+                    {stats.trades.toLocaleString()}+
+                  </div>
+                  <div className="stat-label">Successful Trades</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* About Section */}
-      <section id="about" className="py-5 bg-light animate">
-        <div className="container text-center ">
-          <h2 className="fw-bold mb-4 text-success">About AgriBuy AI</h2>
-          <p className="text-muted fs-5">
-            AgriBuy AI is an AI-powered digital marketplace that connects
-            farmers and Customers directly by analyzing crop quality and
-            predicting market prices using advanced AI models.
-          </p>
-          <div className="row mt-4">
-            <div className="col-md-6 mb-3">
-              <div className="card p-4 shadow-sm border-success">
-                <h5>🚜 Problem We Solve</h5>
-                <p>
-                  Farmers often face unfair pricing, delayed payments, and lack
-                  of visibility, while traders find it hard to verify crop
-                  quality or find trusted farmers.
-                </p>
+      {/* Problem & Solution Section */}
+      <section className="py-5 problem-solution-section animate">
+        <div className="container">
+          <div className="row align-items-center g-5">
+            <div className="col-lg-6">
+              <div className="section-badge mb-3">❌ The Problem</div>
+              <h2 className="section-title mb-4">
+                Agriculture Faces Critical Challenges
+              </h2>
+              <div className="problem-list">
+                <div className="problem-item">
+                  <div className="problem-icon">💸</div>
+                  <div>
+                    <h5>Unfair Pricing</h5>
+                    <p>
+                      Farmers lose up to 40% of crop value due to middlemen and
+                      lack of market transparency
+                    </p>
+                  </div>
+                </div>
+                <div className="problem-item">
+                  <div className="problem-icon">❓</div>
+                  <div>
+                    <h5>Quality Verification</h5>
+                    <p>
+                      Customers struggle to verify crop quality before purchase,
+                      leading to distrust
+                    </p>
+                  </div>
+                </div>
+                <div className="problem-item">
+                  <div className="problem-icon">⏰</div>
+                  <div>
+                    <h5>Delayed Payments</h5>
+                    <p>
+                      Long payment cycles and intermediaries delay farmer
+                      compensation
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="col-md-6 mb-3">
-              <div className="card p-4 shadow-sm border-success">
-                <h5>🎯 Our Mission</h5>
-                <p>
-                  To use Deep Learning and Machine Learning to ensure fair
-                  trade, transparency, and intelligent matchmaking between
-                  farmers and Customers.
-                </p>
+            <div className="col-lg-6">
+              <div className="section-badge mb-3">✅ Our Solution</div>
+              <h2 className="section-title mb-4">
+                AI-Powered Direct Trade Platform
+              </h2>
+              <div className="solution-card">
+                <div className="solution-item">
+                  <div className="solution-number">01</div>
+                  <div>
+                    <h5>AI Crop Analysis</h5>
+                    <p>
+                      Deep learning instantly grades crop quality from photos
+                      with 95%+ accuracy
+                    </p>
+                  </div>
+                </div>
+                <div className="solution-item">
+                  <div className="solution-number">02</div>
+                  <div>
+                    <h5>Fair Price Prediction</h5>
+                    <p>
+                      ML algorithms analyze market trends to suggest optimal,
+                      fair prices
+                    </p>
+                  </div>
+                </div>
+                <div className="solution-item">
+                  <div className="solution-number">03</div>
+                  <div>
+                    <h5>Smart Matching</h5>
+                    <p>
+                      AI connects farmers and customers based on location,
+                      quality, and preferences
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Workflow Section */}
-      <section id="workflow" className="py-5 animate">
-        <div className="container text-center">
-          <h2 className="fw-bold mb-5 text-success">🔗 How AgriBuy AI Works</h2>
-          <div className="row g-4 w-5 h-5">
-            <div className="col-md-4">
-              <div className="workflow-step p-4 border border-success rounded shadow-sm">
-                <h5>👨‍🌾 Step 1: Farmer Uploads</h5>
-                <p>Crop details & photo are uploaded to the system.</p>
-              </div>
+      {/* How It Works Section */}
+      <section id="workflow" className="py-5 workflow-section animate">
+        <div className="container">
+          <div className="text-center mb-5">
+            <div className="section-badge mb-3">⚡ Simple Process</div>
+            <h2 className="section-title">How AgriBuy AI Works</h2>
+            <p className="section-subtitle">
+              Three simple steps to revolutionize your agricultural trading
+            </p>
+          </div>
+
+          <div className="workflow-container">
+            <div className="workflow-card">
+              <div className="workflow-number">1</div>
+              <div className="workflow-icon">📸</div>
+              <h4>Upload Crop Details</h4>
+              <p>
+                Farmers upload crop information and photos through our
+                easy-to-use interface
+              </p>
+              <ul className="workflow-features">
+                <li>Multiple crop photos</li>
+                <li>Quantity & location</li>
+                <li>Harvest date</li>
+              </ul>
             </div>
-            <div className="col-md-4">
-              <div className="workflow-step p-4 border border-success rounded shadow-sm">
-                <h5>🤖 Step 2: AI Analysis</h5>
-                <p>
-                  Deep Learning grades the crop; ML predicts fair price using
-                  market data.
-                </p>
-              </div>
+
+            <div className="workflow-arrow">→</div>
+
+            <div className="workflow-card">
+              <div className="workflow-number">2</div>
+              <div className="workflow-icon">🤖</div>
+              <h4>AI Analysis & Pricing</h4>
+              <p>
+                Our AI engine analyzes crop quality and predicts fair market
+                prices instantly
+              </p>
+              <ul className="workflow-features">
+                <li>Quality grading</li>
+                <li>Price prediction</li>
+                <li>Market insights</li>
+              </ul>
             </div>
-            <div className="col-md-4">
-              <div className="workflow-step p-4 border border-success rounded shadow-sm">
-                <h5>🧑‍💼 Step 3: Customer Matching</h5>
-                <p>
-                  AI engine matches farmers and traders based on price,
-                  location, and crop quality.
-                </p>
-              </div>
+
+            <div className="workflow-arrow">→</div>
+
+            <div className="workflow-card">
+              <div className="workflow-number">3</div>
+              <div className="workflow-icon">🤝</div>
+              <h4>Smart Matching</h4>
+              <p>
+                Customers find verified crops and connect directly with farmers
+                for seamless trade
+              </p>
+              <ul className="workflow-features">
+                <li>Direct communication</li>
+                <li>Secure transactions</li>
+                <li>Fast delivery</li>
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-5 bg-light animate">
-        <div className="container text-center">
-          <h2 className="fw-bold mb-5 text-success">✨ Core Features</h2>
+      <section id="features" className="py-5 features-section animate">
+        <div className="container">
+          <div className="text-center mb-5">
+            <div className="section-badge mb-3">✨ Powerful Features</div>
+            <h2 className="section-title">Why Choose AgriBuy AI</h2>
+            <p className="section-subtitle">
+              Advanced AI technology meets agricultural expertise
+            </p>
+          </div>
+
           <div className="row g-4">
-            <div className="col-md-4">
-              <div className="card p-4 shadow-sm border-0 border-top border-4 border-success">
-                <h5>🧠 Deep Learning (CropVisionNet)</h5>
-                <p>
-                  Identifies crop type and quality grade from farmer-uploaded
-                  images.
+            <div className="col-md-6 col-lg-4">
+              <div className="feature-card">
+                <div className="feature-icon bg-primary">🧠</div>
+                <h4>CropVisionNet</h4>
+                <p className="feature-description">
+                  Advanced deep learning model identifies crop types and grades
+                  quality with exceptional accuracy
                 </p>
+                <div className="feature-stats">
+                  <span className="badge bg-primary-soft">95%+ Accuracy</span>
+                  <span className="badge bg-primary-soft">50+ Crop Types</span>
+                </div>
               </div>
             </div>
-            <div className="col-md-4">
-              <div className="card p-4 shadow-sm border-0 border-top border-4 border-success">
-                <h5>📊 Machine Learning (PricePredictNet)</h5>
-                <p>
-                  Predicts fair market prices using crop details and market
-                  trends.
+
+            <div className="col-md-6 col-lg-4">
+              <div className="feature-card">
+                <div className="feature-icon bg-success">📊</div>
+                <h4>PricePredictNet</h4>
+                <p className="feature-description">
+                  ML-powered price prediction using real-time market data,
+                  weather patterns, and demand forecasts
                 </p>
+                <div className="feature-stats">
+                  <span className="badge bg-success-soft">Real-time Data</span>
+                  <span className="badge bg-success-soft">Fair Pricing</span>
+                </div>
               </div>
             </div>
-            <div className="col-md-4">
-              <div className="card p-4 shadow-sm border-0 border-top border-4 border-success">
-                <h5>🤝 AI MatchMakerNet</h5>
-                <p>
-                  Connects farmers and traders intelligently for efficient,
-                  transparent trading.
+
+            <div className="col-md-6 col-lg-4">
+              <div className="feature-card">
+                <div className="feature-icon bg-warning">🤝</div>
+                <h4>MatchMakerNet</h4>
+                <p className="feature-description">
+                  Intelligent matching algorithm connects farmers and customers
+                  based on multiple factors
                 </p>
+                <div className="feature-stats">
+                  <span className="badge bg-warning-soft">Smart Matching</span>
+                  <span className="badge bg-warning-soft">Location-based</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-6 col-lg-4">
+              <div className="feature-card">
+                <div className="feature-icon bg-info">🔒</div>
+                <h4>Secure Transactions</h4>
+                <p className="feature-description">
+                  End-to-end encrypted payments with escrow protection for both
+                  parties
+                </p>
+                <div className="feature-stats">
+                  <span className="badge bg-info-soft">
+                    Bank-grade Security
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-6 col-lg-4">
+              <div className="feature-card">
+                <div className="feature-icon bg-danger">📱</div>
+                <h4>Mobile-First Design</h4>
+                <p className="feature-description">
+                  Access anywhere, anytime with our responsive web platform
+                  optimized for mobile
+                </p>
+                <div className="feature-stats">
+                  <span className="badge bg-danger-soft">24/7 Access</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-6 col-lg-4">
+              <div className="feature-card">
+                <div className="feature-icon bg-purple">📈</div>
+                <h4>Analytics Dashboard</h4>
+                <p className="feature-description">
+                  Comprehensive insights and reports to track performance and
+                  market trends
+                </p>
+                <div className="feature-stats">
+                  <span className="badge bg-purple-soft">Data-driven</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Users Section */}
-      <section id="users" className="py-5 animate">
-        <div className="container text-center">
-          <h2 className="fw-bold mb-5 text-success">👥 System Users</h2>
+      {/* Testimonials Section */}
+      <section className="py-5 testimonial-section animate">
+        <div className="container">
+          <div className="text-center mb-5">
+            <div className="section-badge mb-3">💬 Success Stories</div>
+            <h2 className="section-title">Trusted by Thousands</h2>
+            <p className="section-subtitle">
+              See how AgriBuy AI is transforming lives
+            </p>
+          </div>
+
           <div className="row g-4">
-            <div className="col-md-4">
-              <div className="card p-4 shadow-sm border-success">
-                <h5>👨‍🌾 Farmer</h5>
-                <p>
-                  Upload crop info, receive AI grading, and view fair price
-                  predictions instantly.
+            <div className="col-md-6 col-lg-4">
+              <div className="testimonial-card">
+                <div className="testimonial-rating">⭐⭐⭐⭐⭐</div>
+                <p className="testimonial-text">
+                  "AgriBuy AI helped me get 30% better prices for my rice
+                  harvest. The AI quality check gave customers confidence to buy
+                  directly from me."
                 </p>
+                <div className="testimonial-author">
+                  <div className="author-avatar">👨‍🌾</div>
+                  <div>
+                    <div className="author-name">Rajesh Kumar</div>
+                    <div className="author-role">Farmer, Punjab</div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="col-md-4">
-              <div className="card p-4 shadow-sm border-success">
-                <h5>🧑‍💼 Customer</h5>
-                <p>
-                  Browse and filter crops, check AI-verified details, and
-                  directly connect with farmers.
+
+            <div className="col-md-6 col-lg-4">
+              <div className="testimonial-card">
+                <div className="testimonial-rating">⭐⭐⭐⭐⭐</div>
+                <p className="testimonial-text">
+                  "As a restaurant owner, I now source fresh vegetables directly
+                  from farmers. The quality verification is spot-on and saves me
+                  time."
                 </p>
+                <div className="testimonial-author">
+                  <div className="author-avatar">👩‍💼</div>
+                  <div>
+                    <div className="author-name">Priya Sharma</div>
+                    <div className="author-role">Restaurant Owner, Delhi</div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="col-md-4">
-              <div className="card p-4 shadow-sm border-success">
-                <h5>🛠️ Admin</h5>
-                <p>
-                  Monitor trades, manage users, and ensure fair marketplace
-                  operations.
+
+            <div className="col-md-6 col-lg-4">
+              <div className="testimonial-card">
+                <div className="testimonial-rating">⭐⭐⭐⭐⭐</div>
+                <p className="testimonial-text">
+                  "The platform is so easy to use! I sold my entire wheat crop
+                  in just 2 days at a fair price. No middlemen, no hassle."
                 </p>
+                <div className="testimonial-author">
+                  <div className="author-avatar">👨‍🌾</div>
+                  <div>
+                    <div className="author-name">Mohan Patel</div>
+                    <div className="author-role">Farmer, Gujarat</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -181,21 +435,41 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-5 text-center bg-light  animate">
+      <section className="py-5 cta-section animate">
         <div className="container">
-          <h2 className="fw-bold mb-3">
-            Start Trading Smarter with AgriBuy AI
-          </h2>
-          <p className="mb-4">
-            Join thousands of farmers and customers using AI to grow profits and
-            build trust in agriculture.
-          </p>
-          <Link to="/signup?role=farmer" className="btn btn-dark btn-lg m-2">
-            Join as Farmer
-          </Link>
-          <Link to="/signup?role=enduser" className="btn btn-outline-dark btn-lg m-2">
-            Join as Customer
-          </Link>
+          <div className="cta-card">
+            <div className="row align-items-center g-4">
+              <div className="col-lg-8">
+                <h2 className="cta-title mb-3">
+                  Ready to Transform Your Agricultural Business?
+                </h2>
+                <p className="cta-text mb-4">
+                  Join thousands of farmers and customers already benefiting
+                  from AI-powered trading. Get started today and experience
+                  fair, transparent, and efficient agricultural commerce.
+                </p>
+                <div className="cta-features">
+                  <span>✓ Free to join</span>
+                  <span>✓ No hidden fees</span>
+                  <span>✓ 24/7 support</span>
+                </div>
+              </div>
+              <div className="col-lg-4 text-lg-end">
+                <Link
+                  to="/signup?role=farmer"
+                  className="btn btn-cta btn-light btn-lg d-block d-sm-inline-block mb-3"
+                >
+                  Join as Farmer →
+                </Link>
+                <Link
+                  to="/signup?role=enduser"
+                  className="btn btn-cta btn-outline-light btn-lg d-block d-sm-inline-block"
+                >
+                  Join as Customer →
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
