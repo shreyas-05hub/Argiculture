@@ -3,7 +3,7 @@ import axios from "axios";
 import "../styles/AdminDash.css";
 import AdminLayout from "./AdminLayout";
 
-const UserManagement = () => {
+const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
 
   // Fetch users from backend
@@ -43,7 +43,6 @@ const UserManagement = () => {
           <div
             className="col-md-12 content container-fluid"
             style={{
-              background: " #b3e6b1",
               background:
                 "linear-gradient(90deg, rgba(179, 230, 177, 1) 0%, rgba(179, 230, 177, 1) 88%)",
             }}
@@ -128,4 +127,4 @@ const UserManagement = () => {
   );
 };
 
-export default UserManagement;
+export default AdminDashboard;

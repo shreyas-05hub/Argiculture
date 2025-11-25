@@ -13,10 +13,14 @@ const getPreview = (img) => {
 
 const FarmerDashboard = () => {
   const [showAddCropAnimation, setShowAddCropAnimation] = useState(false);
-  const [showForm, setShowForm] = useState(false);
   const [crops, setCrops] = useState([]);
   const [farmer, setFarmer] = useState(null);
+<<<<<<< HEAD
+  const [showVideo, setShowVideo] = useState(false);
 
+  const latestCrop = crops.length > 0 ? crops[crops.length - 1] : null;
+  const recentQuantity = crops.length > 0 ? Number(crops[crops.length - 1].quantity) : 0;
+=======
   const [showDemo, setShowDemo] = useState(false);
 
   // Calculate stats
@@ -54,15 +58,40 @@ const FarmerDashboard = () => {
   };
 
   const callMlModel = async (cropData) => {
-    // mock: emulate call latency
-    await new Promise((res) => setTimeout(res, 500));
+    // Simulate API call delay
+    await new Promise((res) => setTimeout(res, 1500));
+
+    // Generate realistic AI results
+    const grades = ["A", "B", "C"];
+    const marketTrends = ["High Demand", "Medium Demand", "Low Demand"];
+    
+    // Base price based on crop type (simplified)
+    const basePrices = {
+      wheat: 2000,
+      rice: 2500,
+      corn: 1800,
+      sugarcane: 1500,
+      cotton: 3000,
+      default: 2200
+    };
+
+    const cropName = cropData.cropName.toLowerCase();
+    let basePrice = basePrices.default;
+    
+    if (cropName.includes("wheat")) basePrice = basePrices.wheat;
+    else if (cropName.includes("rice")) basePrice = basePrices.rice;
+    else if (cropName.includes("corn")) basePrice = basePrices.corn;
+    else if (cropName.includes("sugarcane")) basePrice = basePrices.sugarcane;
+    else if (cropName.includes("cotton")) basePrice = basePrices.cotton;
+
+    const grade = grades[Math.floor(Math.random() * 3)];
+    const gradeMultiplier = grade === "A" ? 1.2 : grade === "B" ? 1.0 : 0.8;
+    const predictedPrice = Math.round(basePrice * gradeMultiplier + Math.random() * 500);
 
     return {
       grade: ["A", "B", "C"][Math.floor(Math.random() * 3)],
       predictedPrice: Math.round(2000 + Math.random() * 1000),
-      marketTrend: ["High Demand", "Medium Demand", "Low Demand"][
-        Math.floor(Math.random() * 3)
-      ],
+      marketTrend: ["High Demand", "Medium Demand", "Low Demand"][Math.floor(Math.random() * 3)],
     };
   };
 
@@ -116,29 +145,30 @@ const FarmerDashboard = () => {
       return;
     }
 
-    const ml = await callMlModel(formData);
+    try {
+      // Call AI model for analysis
+      const mlResult = await callMlModel(cropData);
 
-    const newCrop = {
-      id: Date.now(),
-      farmerName: farmer.username,
-      cropName: formData.cropName,
-      quantity: formData.quantity,
-      price: formData.price,
-      location: formData.location,
-      description: formData.description,
-      image: formData.image,
-      status: "ModelSuggested",
-      mlResult: ml,
-      reason: "",
-      timestamp: Date.now(),
-    };
+      // Create new crop object
+      const newCrop = {
+        id: Date.now(),
+        farmerName: farmer.username,
+        cropName: cropData.cropName,
+        quantity: cropData.quantity,
+        price: cropData.price || "",
+        location: cropData.location,
+        description: cropData.description || "",
+        image: cropData.image || null,
+        status: "ModelSuggested",
+        mlResult: mlResult,
+        reason: "",
+        timestamp: Date.now(),
+      };
 
     const updated = [...crops, newCrop];
     saveCropsToStorage(updated);
 
-    alert(
-      "Crop added successfully! Check the AI suggestions in your crop list."
-    );
+    alert("Crop added successfully! Check the AI suggestions in your crop list.");
 
     // Open the Add Crop Animation modal briefly if you want
     setShowAddCropAnimation(true);
@@ -172,10 +202,9 @@ const FarmerDashboard = () => {
     // If payload contains immediate crop details to add, you could call handleAdd() variant here.
   };
 
+  // Handle farmer agreement with AI suggestions
   const farmerAgrees = (cropId) => {
-    const updatedLocal = crops.map((c) =>
-      c.id === cropId ? { ...c, status: "Pending" } : c
-    );
+    const updatedLocal = crops.map((c) => (c.id === cropId ? { ...c, status: "Pending" } : c));
     saveCropsToStorage(updatedLocal);
 
     const storedRequests =
@@ -205,22 +234,24 @@ const FarmerDashboard = () => {
 
       storedRequests.push(newRequest);
       localStorage.setItem("cropRequests", JSON.stringify(storedRequests));
+      
+      alert(`Request for "${crop.cropName}" sent to admin for approval!`);
+    } else {
+      alert("Request already sent to admin!");
     }
-
-    alert("Request sent to admin for approval");
   };
 
+  // Handle farmer disagreement with AI suggestions
   const farmerDeclines = (cropId) => {
-    const updatedLocal = crops.map((c) =>
-      c.id === cropId ? { ...c, status: "Declined" } : c
-    );
+    const updatedLocal = crops.map((c) => (c.id === cropId ? { ...c, status: "Declined" } : c));
     saveCropsToStorage(updatedLocal);
+    alert("Admin rejected the crop request!");
   };
 
   if (!farmer) {
     return (
       <div className="container mt-5">
-        <h4>No farmer details. Login again.</h4>
+        <h4>No farmer details. Please login again.</h4>
       </div>
     );
   }
@@ -232,7 +263,10 @@ const FarmerDashboard = () => {
         className="container-fluid p-4 mb-4"
         style={{
           background: "linear-gradient(to right, #80f57cff,  #428742ff)",
+<<<<<<< HEAD
 
+          borderRadius: "0 0 20px 20px",
+=======
           borderRadius: "15px",
         }}
       >
@@ -242,11 +276,9 @@ const FarmerDashboard = () => {
               Smart Agro Grading & Marketplace
             </h1>
             <p className="mt-3 text-white fs-5">
-              Our platform helps farmers by grading their crops, providing
-              accurate price suggestions, and pickup from doorstep.
+              AI-powered crop grading, fair price suggestions, and seamless market access for farmers.
             </p>
           </div>
-
           <div className="col-md-6 text-center">
             <img
               src="../assets/hero-section-gif.gif"
@@ -260,33 +292,34 @@ const FarmerDashboard = () => {
 
       {/* SMART CROP GRADING CARD */}
       <div
-        className="card p-3 shadow-sm border-0 mb-4"
+        className="card p-4 shadow-sm border-0 mb-4"
         style={{ borderRadius: "15px", background: "#f8fff5" }}
       >
         <div className="text-center">
           <h4 className="fw-bold text-success mb-3">🌾 Smart Crop Grading</h4>
-          <p className="text-muted mb-3">
-            AI analyzes your crop and suggests best market price.
+          <p className="text-muted mb-4">
+            Upload your crop details and get instant AI-powered quality grading and fair price suggestions.
           </p>
 
           <div className="d-flex justify-content-center gap-3">
-            <button
-              onClick={() => setShowDemo(true)}
-              className="btn btn-outline-success"
-            >
+            <button onClick={() => setShowDemo(true)} className="btn btn-outline-success">
               <i className="bi bi-play-circle me-2"></i>Watch Demo
             </button>
 
-            {/* Updated Add Crop Button with Animation */}
+            {/* Main Add Crop Button with Animation */}
             <motion.button
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ 
+                scale: 1.05,
+                boxShadow: "0 8px 25px rgba(40, 167, 69, 0.3)"
+              }}
               whileTap={{ scale: 0.95 }}
-              className="btn btn-success px-4 position-relative"
-              onClick={handleAddCropClick}
+              className="btn btn-success px-4 py-2 position-relative pulse-button"
+              onClick={() => setShowAddCropAnimation(true)}
               style={{
                 background: "linear-gradient(135deg, #28a745, #20c997)",
                 border: "none",
                 fontWeight: "600",
+                minWidth: "140px"
               }}
             >
               <motion.span
@@ -317,17 +350,11 @@ const FarmerDashboard = () => {
       />
 
       {/* Watch Demo Modal (single instance) */}
-      <WatchDemoAnimation
-        isOpen={showDemo}
-        onClose={() => setShowDemo(false)}
-      />
+      <WatchDemoAnimation isOpen={showDemo} onClose={() => setShowDemo(false)} />
 
       {/* Quick Add Crop button (opens form) */}
       <div className="mb-4">
-        <button
-          className="btn btn-success px-4"
-          onClick={() => setShowForm(true)}
-        >
+        <button className="btn btn-success px-4" onClick={() => setShowForm(true)}>
           + Add Crop
         </button>
       </div>
@@ -337,10 +364,7 @@ const FarmerDashboard = () => {
         <div className="card p-4 shadow-sm mb-4">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className="mb-0">Add New Crop</h5>
-            <button
-              className="btn-close"
-              onClick={() => setShowForm(false)}
-            ></button>
+            <button className="btn-close" onClick={() => setShowForm(false)}></button>
           </div>
 
           <div className="row">
@@ -398,10 +422,7 @@ const FarmerDashboard = () => {
             <button className="btn btn-success me-2" onClick={handleAdd}>
               Add Crop
             </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setShowForm(false)}
-            >
+            <button className="btn btn-secondary" onClick={() => setShowForm(false)}>
               Cancel
             </button>
           </div>
@@ -411,9 +432,10 @@ const FarmerDashboard = () => {
       {/* STATS CARDS */}
       <div className="row mb-4">
         <div className="col-md-3 mb-3">
-          <div className="card text-center p-3 shadow-sm h-100">
+          <div className="card text-center p-3 shadow-sm h-100 border-0">
             <div className="card-body">
-              <h6 className="card-title">Recently Sold Crop</h6>
+              <i className="bi bi-basket text-success fs-4 mb-2"></i>
+              <h6 className="card-title text-muted">Recently Sold</h6>
               <p className="card-text fs-5 fw-bold text-success">
                 {latestSoldCrop ? latestSoldCrop.cropName : "None"}
               </p>
@@ -422,39 +444,80 @@ const FarmerDashboard = () => {
         </div>
 
         <div className="col-md-3 mb-3">
-          <div className="card text-center p-3 shadow-sm h-100">
+          <div className="card text-center p-3 shadow-sm h-100 border-0">
             <div className="card-body">
               <h6 className="card-title">Total Quantity Sold</h6>
-              <p className="card-text fs-5 fw-bold text-primary">
-                {totalQuantity} kg
-              </p>
+              <p className="card-text fs-5 fw-bold text-primary">{totalQuantity} kg</p>
             </div>
           </div>
         </div>
 
         <div className="col-md-3 mb-3">
-          <div className="card text-center p-3 shadow-sm h-100">
+          <div className="card text-center p-3 shadow-sm h-100 border-0">
             <div className="card-body">
               <h6 className="card-title">Pending Requests</h6>
-              <p className="card-text fs-5 fw-bold text-warning">
-                {pendingRequests}
-              </p>
+              <p className="card-text fs-5 fw-bold text-warning">{pendingRequests}</p>
             </div>
           </div>
         </div>
 
         <div className="col-md-3 mb-3">
-          <div className="card text-center p-3 shadow-sm h-100">
+          <div className="card text-center p-3 shadow-sm h-100 border-0">
             <div className="card-body">
               <h6 className="card-title">Total Acres</h6>
-              <p className="card-text fs-5 fw-bold text-info">
-                {farmer.acres || "N/A"} Acres
-              </p>
+              <p className="card-text fs-5 fw-bold text-info">{farmer.acres || "N/A"} Acres</p>
             </div>
           </div>
         </div>
       </div>
 
+<<<<<<< HEAD
+      {/* PREVIOUS / NEWLY ADDED CROPS */}
+      <div className="mt-4 mb-4 p-5">
+        <h5>{showPrevious ? "Previous Crops" : "Newly Added Crops"}</h5>
+        <div className="row">
+          {showPrevious
+            ? crops
+                .filter((c) => c.status === "Accepted")
+                .map((crop) => (
+                  <div key={crop.id} className="col-md-3 mt-3">
+                    <div className="card shadow-sm">
+                      {crop.image && (
+                        <img
+                          src={crop.image}
+                          className="card-img-top"
+                          style={{ height: "150px", objectFit: "cover" }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                ))
+            : crops
+                .filter((c) => c.status !== "Accepted")
+                .map((crop) => (
+                  <div key={crop.id} className="col-md-3 mt-3">
+                    <div className="card shadow-sm">
+                      {crop.image && (
+                        <img
+                          src={crop.image}
+                          className="card-img-top"
+                          style={{ height: "150px", objectFit: "cover" }}
+                        />
+                      )}
+                      <div className="card-body">
+                        <h6>{crop.cropName}</h6>
+                        <p>
+                          <strong>Qty:</strong> {crop.quantity} kg
+                        </p>
+                        <p>
+                          <strong>Price:</strong> ₹{crop.price}
+                        </p>
+                        <p className="small">{crop.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+=======
       {/* NEW CROPS - Only ModelSuggested status */}
       <div className="mb-4">
         <h4 className="fw-bold mb-3">New Crop Suggestions</h4>
@@ -485,6 +548,7 @@ const FarmerDashboard = () => {
                 />
               </div>
             ))}
+>>>>>>> ec75e5741af9d6613f75e6b1ef2301698618213e
         </div>
         {crops.filter((c) => c.status === "ModelSuggested").length === 0 && (
           <div className="text-center py-4">
@@ -493,20 +557,13 @@ const FarmerDashboard = () => {
         )}
       </div>
 
-      {/* PENDING & PROCESSING CROPS - All non-ModelSuggested, non-Accepted crops */}
+      {/* PROCESSING REQUESTS - Waiting for admin action */}
       <div className="mb-4">
         <h4 className="fw-bold mb-3">Processing Requests</h4>
-        <p className="text-muted mb-3">
-          Crops waiting for admin approval or action
-        </p>
+        <p className="text-muted mb-3">Crops waiting for admin approval or action</p>
         <div className="row g-3">
           {crops
-            .filter(
-              (c) =>
-                c.status === "Pending" ||
-                c.status === "Rejected" ||
-                c.status === "Declined"
-            )
+            .filter((c) => c.status === "Pending" || c.status === "Rejected" || c.status === "Declined")
             .map((crop) => (
               <div className="col-xl-3 col-lg-4 col-md-6" key={crop.id}>
                 <CropCard
@@ -529,24 +586,17 @@ const FarmerDashboard = () => {
               </div>
             ))}
         </div>
-        {crops.filter(
-          (c) =>
-            c.status === "Pending" ||
-            c.status === "Rejected" ||
-            c.status === "Declined"
-        ).length === 0 && (
+        {crops.filter((c) => c.status === "Pending" || c.status === "Rejected" || c.status === "Declined").length === 0 && (
           <div className="text-center py-4">
             <p className="text-muted">No crops in processing.</p>
           </div>
         )}
       </div>
 
-      {/* PREVIOUSLY SOLD CROPS - Only Accepted status */}
+      {/* SOLD CROPS HISTORY */}
       <div className="mb-4">
         <h4 className="fw-bold mb-3">Sold Crops History</h4>
-        <p className="text-muted mb-3">
-          Crops successfully sold through the platform
-        </p>
+        <p className="text-muted mb-3">Crops successfully sold through the platform</p>
         <div className="row g-3">
           {crops
             .filter((c) => c.status === "Accepted")
@@ -573,7 +623,7 @@ const FarmerDashboard = () => {
         </div>
         {crops.filter((c) => c.status === "Accepted").length === 0 && (
           <div className="text-center py-4">
-            <p className="text-muted">No crops sold yet.</p>
+            <p className="text-muted">No crops sold yet. Start by adding your crops above!</p>
           </div>
         )}
       </div>

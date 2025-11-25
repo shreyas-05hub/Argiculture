@@ -429,4 +429,6 @@ export default function AboutUs() {
       </main>
     </>
   );
-}
+};
+
+export default AboutUs;

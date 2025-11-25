@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../components/AdminLayout";
 
@@ -13,7 +12,6 @@ const MarketManagement = () => {
     setRequests(stored);
   }, []);
 
-  // refresh requests from storage
   const refresh = () => {
     const stored = JSON.parse(localStorage.getItem("cropRequests")) || [];
     setRequests(stored);
@@ -26,7 +24,6 @@ const MarketManagement = () => {
     );
     localStorage.setItem("cropRequests", JSON.stringify(updated));
 
-    // also update crops array to mark the crop as Accepted
     const storedCrops = JSON.parse(localStorage.getItem("crops")) || [];
     const reconciled = storedCrops.map((c) =>
       c.id === stored.find((s) => s.id === reqId)?.cropId
@@ -64,9 +61,9 @@ const MarketManagement = () => {
     );
     localStorage.setItem("cropRequests", JSON.stringify(updated));
 
-    // update crops array with rejection and reason
     const storedCrops = JSON.parse(localStorage.getItem("crops")) || [];
     const targetReq = updated.find((u) => u.id === rejectForId);
+
     const reconciled = storedCrops.map((c) =>
       c.id === targetReq.cropId
         ? { ...c, status: "Rejected", reason: rejectReason }
@@ -92,10 +89,9 @@ const MarketManagement = () => {
     <AdminLayout>
       <div
         className="container-fluid p-4"
-        style={{ height: "100vh" ,
-          background: " #b3e6b1",
-          background:
-            "linear-gradient(90deg, rgba(179, 230, 177, 1) 0%, rgba(179, 230, 177, 1) 88%)",
+        style={{
+          height: "100vh",
+          background: "linear-gradient(90deg, #b3e6b1 0%, #b3e6b1 88%)",
         }}
       >
         <h2>Crop Requests</h2>
@@ -128,11 +124,11 @@ const MarketManagement = () => {
                       <td>{r.price}</td>
                       <td>{r.location || "—"}</td>
                       <td>{r.status}</td>
-                      <td
-                        style={{ maxWidth: "200px", wordBreak: "break-word" }}
-                      >
+
+                      <td style={{ maxWidth: "200px", wordBreak: "break-word" }}>
                         {r.status === "Rejected" ? r.reason : "—"}
                       </td>
+
                       <td>
                         {r.status === "Pending" && (
                           <>
@@ -184,7 +180,7 @@ const MarketManagement = () => {
           </div>
         </div>
 
-        {/* Reject Reason Modal (simple inline modal) */}
+        {/* Reject Modal */}
         {showRejectModal && (
           <div
             className="modal fade show d-block"
@@ -238,4 +234,3 @@ const MarketManagement = () => {
 };
 
 export default MarketManagement;
-

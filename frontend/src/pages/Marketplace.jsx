@@ -22,7 +22,7 @@ const Marketplace = () => {
     <div
       className="container-fluid py-4"
       style={{
-        background: " #b3e6b1",
+        backgroundColor: "#b3e6b1",
         background:
           "linear-gradient(90deg, rgba(179, 230, 177, 1) 0%, rgba(179, 230, 177, 1) 88%)",
       }}
