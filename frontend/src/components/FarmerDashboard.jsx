@@ -16,17 +16,13 @@ const FarmerDashboard = () => {
   const [showForm, setShowForm] = useState(false);
   const [crops, setCrops] = useState([]);
   const [farmer, setFarmer] = useState(null);
-<<<<<<< HEAD
-  const [showVideo, setShowVideo] = useState(false);
 
-  const latestCrop = crops.length > 0 ? crops[crops.length - 1] : null;
-  const recentQuantity = crops.length > 0 ? Number(crops[crops.length - 1].quantity) : 0;
-=======
   const [showDemo, setShowDemo] = useState(false);
->>>>>>> ec75e5741af9d6613f75e6b1ef2301698618213e
 
   // Calculate stats
-  const latestSoldCrop = crops.filter((c) => c.status === "Accepted").slice(-1)[0];
+  const latestSoldCrop = crops
+    .filter((c) => c.status === "Accepted")
+    .slice(-1)[0];
   const totalQuantity = crops
     .filter((c) => c.status === "Accepted")
     .reduce((sum, crop) => sum + (Number(crop.quantity) || 0), 0);
@@ -40,7 +36,9 @@ const FarmerDashboard = () => {
 
     const storedCrops = JSON.parse(localStorage.getItem("crops")) || [];
     if (logged) {
-      const myCrops = storedCrops.filter((c) => c.farmerName === (logged.username || ""));
+      const myCrops = storedCrops.filter(
+        (c) => c.farmerName === (logged.username || "")
+      );
       setCrops(myCrops);
     }
   }, []);
@@ -48,7 +46,9 @@ const FarmerDashboard = () => {
   const saveCropsToStorage = (allCrops) => {
     setCrops(allCrops);
     const storedAll = JSON.parse(localStorage.getItem("crops")) || [];
-    const others = storedAll.filter((c) => c.farmerName !== (farmer?.username || ""));
+    const others = storedAll.filter(
+      (c) => c.farmerName !== (farmer?.username || "")
+    );
     const merged = [...others, ...allCrops];
     localStorage.setItem("crops", JSON.stringify(merged));
   };
@@ -60,7 +60,9 @@ const FarmerDashboard = () => {
     return {
       grade: ["A", "B", "C"][Math.floor(Math.random() * 3)],
       predictedPrice: Math.round(2000 + Math.random() * 1000),
-      marketTrend: ["High Demand", "Medium Demand", "Low Demand"][Math.floor(Math.random() * 3)],
+      marketTrend: ["High Demand", "Medium Demand", "Low Demand"][
+        Math.floor(Math.random() * 3)
+      ],
     };
   };
 
@@ -134,7 +136,9 @@ const FarmerDashboard = () => {
     const updated = [...crops, newCrop];
     saveCropsToStorage(updated);
 
-    alert("Crop added successfully! Check the AI suggestions in your crop list.");
+    alert(
+      "Crop added successfully! Check the AI suggestions in your crop list."
+    );
 
     // Open the Add Crop Animation modal briefly if you want
     setShowAddCropAnimation(true);
@@ -169,10 +173,13 @@ const FarmerDashboard = () => {
   };
 
   const farmerAgrees = (cropId) => {
-    const updatedLocal = crops.map((c) => (c.id === cropId ? { ...c, status: "Pending" } : c));
+    const updatedLocal = crops.map((c) =>
+      c.id === cropId ? { ...c, status: "Pending" } : c
+    );
     saveCropsToStorage(updatedLocal);
 
-    const storedRequests = JSON.parse(localStorage.getItem("cropRequests")) || [];
+    const storedRequests =
+      JSON.parse(localStorage.getItem("cropRequests")) || [];
     const crop = updatedLocal.find((c) => c.id === cropId);
 
     // Check if request already exists
@@ -204,7 +211,9 @@ const FarmerDashboard = () => {
   };
 
   const farmerDeclines = (cropId) => {
-    const updatedLocal = crops.map((c) => (c.id === cropId ? { ...c, status: "Declined" } : c));
+    const updatedLocal = crops.map((c) =>
+      c.id === cropId ? { ...c, status: "Declined" } : c
+    );
     saveCropsToStorage(updatedLocal);
   };
 
@@ -217,34 +226,21 @@ const FarmerDashboard = () => {
   }
 
   return (
-<<<<<<< HEAD
-    <div
-      className="container-fluid mt-4 mb-4 "
-      style={{
-        background: " #b3e6b1",
-        background:
-          "linear-gradient(90deg, rgba(179, 230, 177, 1) 0%, rgba(179, 230, 177, 1) 88%)",
-      }}
-    >
-=======
     <div className="container-fluid mt-4 mb-4">
->>>>>>> ec75e5741af9d6613f75e6b1ef2301698618213e
       {/* HERO SECTION */}
       <div
         className="container-fluid p-4 mb-4"
         style={{
           background: "linear-gradient(to right, #80f57cff,  #428742ff)",
-<<<<<<< HEAD
 
-          borderRadius: "0 0 20px 20px",
-=======
           borderRadius: "15px",
->>>>>>> ec75e5741af9d6613f75e6b1ef2301698618213e
         }}
       >
         <div className="row align-items-center">
           <div className="col-md-6">
-            <h1 className="fw-bold text-white">Smart Agro Grading & Marketplace</h1>
+            <h1 className="fw-bold text-white">
+              Smart Agro Grading & Marketplace
+            </h1>
             <p className="mt-3 text-white fs-5">
               Our platform helps farmers by grading their crops, providing
               accurate price suggestions, and pickup from doorstep.
@@ -274,7 +270,10 @@ const FarmerDashboard = () => {
           </p>
 
           <div className="d-flex justify-content-center gap-3">
-            <button onClick={() => setShowDemo(true)} className="btn btn-outline-success">
+            <button
+              onClick={() => setShowDemo(true)}
+              className="btn btn-outline-success"
+            >
               <i className="bi bi-play-circle me-2"></i>Watch Demo
             </button>
 
@@ -318,11 +317,17 @@ const FarmerDashboard = () => {
       />
 
       {/* Watch Demo Modal (single instance) */}
-      <WatchDemoAnimation isOpen={showDemo} onClose={() => setShowDemo(false)} />
+      <WatchDemoAnimation
+        isOpen={showDemo}
+        onClose={() => setShowDemo(false)}
+      />
 
       {/* Quick Add Crop button (opens form) */}
       <div className="mb-4">
-        <button className="btn btn-success px-4" onClick={() => setShowForm(true)}>
+        <button
+          className="btn btn-success px-4"
+          onClick={() => setShowForm(true)}
+        >
           + Add Crop
         </button>
       </div>
@@ -332,7 +337,10 @@ const FarmerDashboard = () => {
         <div className="card p-4 shadow-sm mb-4">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className="mb-0">Add New Crop</h5>
-            <button className="btn-close" onClick={() => setShowForm(false)}></button>
+            <button
+              className="btn-close"
+              onClick={() => setShowForm(false)}
+            ></button>
           </div>
 
           <div className="row">
@@ -390,7 +398,10 @@ const FarmerDashboard = () => {
             <button className="btn btn-success me-2" onClick={handleAdd}>
               Add Crop
             </button>
-            <button className="btn btn-secondary" onClick={() => setShowForm(false)}>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setShowForm(false)}
+            >
               Cancel
             </button>
           </div>
@@ -414,7 +425,9 @@ const FarmerDashboard = () => {
           <div className="card text-center p-3 shadow-sm h-100">
             <div className="card-body">
               <h6 className="card-title">Total Quantity Sold</h6>
-              <p className="card-text fs-5 fw-bold text-primary">{totalQuantity} kg</p>
+              <p className="card-text fs-5 fw-bold text-primary">
+                {totalQuantity} kg
+              </p>
             </div>
           </div>
         </div>
@@ -423,7 +436,9 @@ const FarmerDashboard = () => {
           <div className="card text-center p-3 shadow-sm h-100">
             <div className="card-body">
               <h6 className="card-title">Pending Requests</h6>
-              <p className="card-text fs-5 fw-bold text-warning">{pendingRequests}</p>
+              <p className="card-text fs-5 fw-bold text-warning">
+                {pendingRequests}
+              </p>
             </div>
           </div>
         </div>
@@ -432,59 +447,14 @@ const FarmerDashboard = () => {
           <div className="card text-center p-3 shadow-sm h-100">
             <div className="card-body">
               <h6 className="card-title">Total Acres</h6>
-              <p className="card-text fs-5 fw-bold text-info">{farmer.acres || "N/A"} Acres</p>
+              <p className="card-text fs-5 fw-bold text-info">
+                {farmer.acres || "N/A"} Acres
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-<<<<<<< HEAD
-      {/* PREVIOUS / NEWLY ADDED CROPS */}
-      <div className="mt-4 mb-4 p-5">
-        <h5>{showPrevious ? "Previous Crops" : "Newly Added Crops"}</h5>
-        <div className="row">
-          {showPrevious
-            ? crops
-                .filter((c) => c.status === "Accepted")
-                .map((crop) => (
-                  <div key={crop.id} className="col-md-3 mt-3">
-                    <div className="card shadow-sm">
-                      {crop.image && (
-                        <img
-                          src={crop.image}
-                          className="card-img-top"
-                          style={{ height: "150px", objectFit: "cover" }}
-                        />
-                      )}
-                    </div>
-                  </div>
-                ))
-            : crops
-                .filter((c) => c.status !== "Accepted")
-                .map((crop) => (
-                  <div key={crop.id} className="col-md-3 mt-3">
-                    <div className="card shadow-sm">
-                      {crop.image && (
-                        <img
-                          src={crop.image}
-                          className="card-img-top"
-                          style={{ height: "150px", objectFit: "cover" }}
-                        />
-                      )}
-                      <div className="card-body">
-                        <h6>{crop.cropName}</h6>
-                        <p>
-                          <strong>Qty:</strong> {crop.quantity} kg
-                        </p>
-                        <p>
-                          <strong>Price:</strong> ₹{crop.price}
-                        </p>
-                        <p className="small">{crop.description}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-=======
       {/* NEW CROPS - Only ModelSuggested status */}
       <div className="mb-4">
         <h4 className="fw-bold mb-3">New Crop Suggestions</h4>
@@ -515,7 +485,6 @@ const FarmerDashboard = () => {
                 />
               </div>
             ))}
->>>>>>> ec75e5741af9d6613f75e6b1ef2301698618213e
         </div>
         {crops.filter((c) => c.status === "ModelSuggested").length === 0 && (
           <div className="text-center py-4">
@@ -527,10 +496,17 @@ const FarmerDashboard = () => {
       {/* PENDING & PROCESSING CROPS - All non-ModelSuggested, non-Accepted crops */}
       <div className="mb-4">
         <h4 className="fw-bold mb-3">Processing Requests</h4>
-        <p className="text-muted mb-3">Crops waiting for admin approval or action</p>
+        <p className="text-muted mb-3">
+          Crops waiting for admin approval or action
+        </p>
         <div className="row g-3">
           {crops
-            .filter((c) => c.status === "Pending" || c.status === "Rejected" || c.status === "Declined")
+            .filter(
+              (c) =>
+                c.status === "Pending" ||
+                c.status === "Rejected" ||
+                c.status === "Declined"
+            )
             .map((crop) => (
               <div className="col-xl-3 col-lg-4 col-md-6" key={crop.id}>
                 <CropCard
@@ -553,7 +529,12 @@ const FarmerDashboard = () => {
               </div>
             ))}
         </div>
-        {crops.filter((c) => c.status === "Pending" || c.status === "Rejected" || c.status === "Declined").length === 0 && (
+        {crops.filter(
+          (c) =>
+            c.status === "Pending" ||
+            c.status === "Rejected" ||
+            c.status === "Declined"
+        ).length === 0 && (
           <div className="text-center py-4">
             <p className="text-muted">No crops in processing.</p>
           </div>
@@ -563,7 +544,9 @@ const FarmerDashboard = () => {
       {/* PREVIOUSLY SOLD CROPS - Only Accepted status */}
       <div className="mb-4">
         <h4 className="fw-bold mb-3">Sold Crops History</h4>
-        <p className="text-muted mb-3">Crops successfully sold through the platform</p>
+        <p className="text-muted mb-3">
+          Crops successfully sold through the platform
+        </p>
         <div className="row g-3">
           {crops
             .filter((c) => c.status === "Accepted")
