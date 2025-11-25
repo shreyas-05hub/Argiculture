@@ -1,0 +1,30 @@
+.image-previews {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.image-preview {
+  width: 80px;
+  height: 80px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-upload-area {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.image-upload-area:hover {
+  border-color: #28a745 !important;
+  background-color: #f8fff5;
+}
