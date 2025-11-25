@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import "./AddCropAnimation.css";
 
 const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
   const [phase, setPhase] = useState("form");
@@ -8,12 +9,30 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
     location: "",
     quantity: "",
     description: "",
-    image: null
+    image: null,
   });
   const [aiResult, setAiResult] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreviews, setImagePreviews] = useState([]);
 
   const delay = (ms) => new Promise(res => setTimeout(res, ms));
+
+  // Handle file selection and create previews
+  const handleFileChange = (files) => {
+    if (!files || files.length === 0) return;
+    
+    // Limit to 5 files
+    const selectedFiles = Array.from(files).slice(0, 5);
+    
+    // Create preview URLs for display
+    const previews = selectedFiles.map(file => URL.createObjectURL(file));
+    
+    setImagePreviews(previews);
+    setFormData(prev => ({
+      ...prev,
+      image: selectedFiles // Store the actual File objects
+    }));
+  };
 
   const simulateAIProcessing = async () => {
     setIsSubmitting(true);
@@ -68,6 +87,7 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
       description: "",
       image: null
     });
+    setImagePreviews([]);
     setAiResult(null);
     setPhase("form");
     setIsSubmitting(false);
@@ -159,8 +179,28 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                             className="d-none"
                             multiple
                             accept=".jpg,.jpeg,.png"
-                            onChange={(e) => handleInputChange('image', e.target.files)}
+                            onChange={(e) => handleFileChange(e.target.files)}
                           />
+                          
+                          {/* Image Previews */}
+                          {imagePreviews.length > 0 && (
+                            <div className="image-previews mt-3">
+                              <div className="d-flex gap-2 flex-wrap justify-content-center">
+                                {imagePreviews.map((preview, index) => (
+                                  <div key={index} className="image-preview">
+                                    <img 
+                                      src={preview} 
+                                      alt={`Preview ${index + 1}`}
+                                      className="preview-img"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                              <small className="text-muted mt-2">
+                                {imagePreviews.length} image(s) selected
+                              </small>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -227,6 +267,7 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                   </motion.div>
                 )}
 
+                {/* Rest of the code remains the same */}
                 {/* AI PROCESSING PHASES */}
                 {(phase === "analyzing" || phase === "grading" || phase === "marketAnalysis") && (
                   <motion.div
