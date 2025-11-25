@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { motion } from "framer-motion";
 import CropCard from "./CropCard";
 import WatchDemoAnimation from "./WatchDemoAnimation";
+import AddCropAnimation from "./AddCropAnimation";
 
 const getPreview = (img) => {
   if (!img) return null;
@@ -10,17 +12,18 @@ const getPreview = (img) => {
 };
 
 const FarmerDashboard = () => {
+  const [showAddCropAnimation, setShowAddCropAnimation] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [crops, setCrops] = useState([]);
   const [farmer, setFarmer] = useState(null);
   const [showDemo, setShowDemo] = useState(false);
 
   // Calculate stats
-  const latestSoldCrop = crops.filter(c => c.status === "Accepted").slice(-1)[0];
+  const latestSoldCrop = crops.filter((c) => c.status === "Accepted").slice(-1)[0];
   const totalQuantity = crops
-    .filter(c => c.status === "Accepted")
+    .filter((c) => c.status === "Accepted")
     .reduce((sum, crop) => sum + (Number(crop.quantity) || 0), 0);
-  const pendingRequests = crops.filter(c => c.status === "Pending").length;
+  const pendingRequests = crops.filter((c) => c.status === "Pending").length;
 
   useEffect(() => {
     const logged = JSON.parse(localStorage.getItem("loggedInUser"));
@@ -30,9 +33,7 @@ const FarmerDashboard = () => {
 
     const storedCrops = JSON.parse(localStorage.getItem("crops")) || [];
     if (logged) {
-      const myCrops = storedCrops.filter(
-        (c) => c.farmerName === (logged.username || "")
-      );
+      const myCrops = storedCrops.filter((c) => c.farmerName === (logged.username || ""));
       setCrops(myCrops);
     }
   }, []);
@@ -40,14 +41,13 @@ const FarmerDashboard = () => {
   const saveCropsToStorage = (allCrops) => {
     setCrops(allCrops);
     const storedAll = JSON.parse(localStorage.getItem("crops")) || [];
-    const others = storedAll.filter(
-      (c) => c.farmerName !== (farmer?.username || "")
-    );
+    const others = storedAll.filter((c) => c.farmerName !== (farmer?.username || ""));
     const merged = [...others, ...allCrops];
     localStorage.setItem("crops", JSON.stringify(merged));
   };
 
   const callMlModel = async (cropData) => {
+    // mock: emulate call latency
     await new Promise((res) => setTimeout(res, 500));
 
     return {
@@ -127,6 +127,12 @@ const FarmerDashboard = () => {
     const updated = [...crops, newCrop];
     saveCropsToStorage(updated);
 
+    alert("Crop added successfully! Check the AI suggestions in your crop list.");
+
+    // Open the Add Crop Animation modal briefly if you want
+    setShowAddCropAnimation(true);
+
+    // Reset form
     setFormData({
       farmerName: farmer.username,
       cropName: "",
@@ -140,19 +146,32 @@ const FarmerDashboard = () => {
     setShowForm(false);
   };
 
+  // top-level click handler for Add Crop button (was previously nested incorrectly)
+  const handleAddCropClick = () => {
+    setShowAddCropAnimation(true);
+  };
+
+  // callback expected by AddCropAnimation (keep simple — you can expand later)
+  const handleAddCropFromAnimation = async (payload) => {
+    // If AddCropAnimation gives form data via payload, you could use it.
+    // For now we'll just close the animation modal and (optionally) open the add form.
+    setShowAddCropAnimation(false);
+    // If you want to open the form instead:
+    // setShowForm(true);
+    // If payload contains immediate crop details to add, you could call handleAdd() variant here.
+  };
+
   const farmerAgrees = (cropId) => {
-    const updatedLocal = crops.map((c) =>
-      c.id === cropId ? { ...c, status: "Pending" } : c
-    );
+    const updatedLocal = crops.map((c) => (c.id === cropId ? { ...c, status: "Pending" } : c));
     saveCropsToStorage(updatedLocal);
 
     const storedRequests = JSON.parse(localStorage.getItem("cropRequests")) || [];
     const crop = updatedLocal.find((c) => c.id === cropId);
-    
+
     // Check if request already exists
     const exists = storedRequests.find((r) => r.cropId === cropId);
 
-    if (!exists) {
+    if (!exists && crop) {
       const newRequest = {
         id: Date.now(),
         cropId: crop.id,
@@ -178,9 +197,7 @@ const FarmerDashboard = () => {
   };
 
   const farmerDeclines = (cropId) => {
-    const updatedLocal = crops.map((c) =>
-      c.id === cropId ? { ...c, status: "Declined" } : c
-    );
+    const updatedLocal = crops.map((c) => (c.id === cropId ? { ...c, status: "Declined" } : c));
     saveCropsToStorage(updatedLocal);
   };
 
@@ -234,37 +251,65 @@ const FarmerDashboard = () => {
           </p>
 
           <div className="d-flex justify-content-center gap-3">
-            <button
-              onClick={() => setShowDemo(true)}
-              className="btn btn-outline-success"
-            >
+            <button onClick={() => setShowDemo(true)} className="btn btn-outline-success">
               <i className="bi bi-play-circle me-2"></i>Watch Demo
             </button>
-            <button
-              className="btn btn-success px-4"
-              onClick={() => setShowForm(true)}
+
+            {/* Updated Add Crop Button with Animation */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="btn btn-success px-4 position-relative"
+              onClick={handleAddCropClick}
+              style={{
+                background: "linear-gradient(135deg, #28a745, #20c997)",
+                border: "none",
+                fontWeight: "600",
+              }}
             >
-              + Add Crop
-            </button>
+              <motion.span
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="me-2"
+              >
+                🌱
+              </motion.span>
+              Add Crop
+              <motion.div
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="position-absolute top-0 start-100 translate-middle p-1 bg-warning border border-light rounded-circle"
+              >
+                <span className="visually-hidden">New</span>
+              </motion.div>
+            </motion.button>
           </div>
         </div>
       </div>
-       
-       {/* Add the Demo Animation Component */}
-      <WatchDemoAnimation 
-        isOpen={showDemo} 
-        onClose={() => setShowDemo(false)} 
+
+      {/* Add Crop Animation Modal */}
+      <AddCropAnimation
+        isOpen={showAddCropAnimation}
+        onClose={() => setShowAddCropAnimation(false)}
+        onAddCrop={handleAddCropFromAnimation}
       />
- 
+
+      {/* Watch Demo Modal (single instance) */}
+      <WatchDemoAnimation isOpen={showDemo} onClose={() => setShowDemo(false)} />
+
+      {/* Quick Add Crop button (opens form) */}
+      <div className="mb-4">
+        <button className="btn btn-success px-4" onClick={() => setShowForm(true)}>
+          + Add Crop
+        </button>
+      </div>
+
       {/* ADD CROP FORM */}
       {showForm && (
         <div className="card p-4 shadow-sm mb-4">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className="mb-0">Add New Crop</h5>
-            <button
-              className="btn-close"
-              onClick={() => setShowForm(false)}
-            ></button>
+            <button className="btn-close" onClick={() => setShowForm(false)}></button>
           </div>
 
           <div className="row">
@@ -322,10 +367,7 @@ const FarmerDashboard = () => {
             <button className="btn btn-success me-2" onClick={handleAdd}>
               Add Crop
             </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setShowForm(false)}
-            >
+            <button className="btn btn-secondary" onClick={() => setShowForm(false)}>
               Cancel
             </button>
           </div>
@@ -349,9 +391,7 @@ const FarmerDashboard = () => {
           <div className="card text-center p-3 shadow-sm h-100">
             <div className="card-body">
               <h6 className="card-title">Total Quantity Sold</h6>
-              <p className="card-text fs-5 fw-bold text-primary">
-                {totalQuantity} kg
-              </p>
+              <p className="card-text fs-5 fw-bold text-primary">{totalQuantity} kg</p>
             </div>
           </div>
         </div>
@@ -360,9 +400,7 @@ const FarmerDashboard = () => {
           <div className="card text-center p-3 shadow-sm h-100">
             <div className="card-body">
               <h6 className="card-title">Pending Requests</h6>
-              <p className="card-text fs-5 fw-bold text-warning">
-                {pendingRequests}
-              </p>
+              <p className="card-text fs-5 fw-bold text-warning">{pendingRequests}</p>
             </div>
           </div>
         </div>
@@ -371,9 +409,7 @@ const FarmerDashboard = () => {
           <div className="card text-center p-3 shadow-sm h-100">
             <div className="card-body">
               <h6 className="card-title">Total Acres</h6>
-              <p className="card-text fs-5 fw-bold text-info">
-                {farmer.acres || "N/A"} Acres
-              </p>
+              <p className="card-text fs-5 fw-bold text-info">{farmer.acres || "N/A"} Acres</p>
             </div>
           </div>
         </div>
@@ -410,7 +446,7 @@ const FarmerDashboard = () => {
               </div>
             ))}
         </div>
-        {crops.filter(c => c.status === "ModelSuggested").length === 0 && (
+        {crops.filter((c) => c.status === "ModelSuggested").length === 0 && (
           <div className="text-center py-4">
             <p className="text-muted">No new crop suggestions available.</p>
           </div>
@@ -446,7 +482,7 @@ const FarmerDashboard = () => {
               </div>
             ))}
         </div>
-        {crops.filter(c => c.status === "Pending" || c.status === "Rejected" || c.status === "Declined").length === 0 && (
+        {crops.filter((c) => c.status === "Pending" || c.status === "Rejected" || c.status === "Declined").length === 0 && (
           <div className="text-center py-4">
             <p className="text-muted">No crops in processing.</p>
           </div>
@@ -481,7 +517,7 @@ const FarmerDashboard = () => {
               </div>
             ))}
         </div>
-        {crops.filter(c => c.status === "Accepted").length === 0 && (
+        {crops.filter((c) => c.status === "Accepted").length === 0 && (
           <div className="text-center py-4">
             <p className="text-muted">No crops sold yet.</p>
           </div>
