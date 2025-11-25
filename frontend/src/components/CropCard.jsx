@@ -12,6 +12,8 @@ const CropCard = ({
   status,
   onAgree,
   onDecline,
+  onAdminAccept,
+  onAdminReject,
   reason 
 }) => {
   return (
@@ -54,13 +56,13 @@ const CropCard = ({
         {/* Status-based rendering */}
         {status === "ModelSuggested" && (
           <div className="action-buttons">
-            <p className="agreement-prompt">Do you Agree with price?</p>
+            <p className="agreement-prompt">Do you agree with AI suggestions?</p>
             <div className="btn-group-grid">
               <button className="btn-agree" onClick={onAgree}>
-                Agree & Send to Admin
+                👍 Yes, Send to Admin
               </button>
               <button className="btn-decline" onClick={onDecline}>
-                Decline
+                👎 No, Decline
               </button>
             </div>
           </div>
@@ -72,7 +74,19 @@ const CropCard = ({
               ⏳ Waiting for Admin Approval
             </span>
             <div className="status-info">
-              <small className="text-muted">Request sent to admin panel</small>
+              <small className="text-muted">Your request is with the admin team</small>
+            </div>
+            {/* Admin Demo Buttons */}
+            <div className="admin-actions mt-2">
+              <small className="text-muted d-block mb-1">Admin Demo:</small>
+              <div className="btn-group-sm d-flex gap-1">
+                <button className="btn btn-success btn-sm flex-fill" onClick={onAdminAccept}>
+                  Accept
+                </button>
+                <button className="btn btn-danger btn-sm flex-fill" onClick={onAdminReject}>
+                  Reject
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -104,7 +118,7 @@ const CropCard = ({
               ✅ Successfully Sold
             </span>
             <div className="status-info">
-              <small className="text-success">Transaction completed</small>
+              <small className="text-success">Transaction completed successfully</small>
             </div>
           </div>
         )}

@@ -1,19 +1,6 @@
 import React from "react";
 import AdminLayout from "../components/AdminLayout";
 const Reports = () => {
-<<<<<<< HEAD
-  return (
-    <AdminLayout>
-      <div
-        style={{
-          height:"100vh",
-          background: " #b3e6b1",
-          background:
-            "linear-gradient(90deg, rgba(179, 230, 177, 1) 0%, rgba(179, 230, 177, 1) 88%)",
-        }}
-      >
-        <h1>Reports</h1>
-=======
   const [requests, setRequests] = useState([]);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectForId, setRejectForId] = useState(null);
@@ -263,7 +250,6 @@ const Reports = () => {
             </div>
           </div>
         )}
->>>>>>> ec75e5741af9d6613f75e6b1ef2301698618213e
       </div>
 
       <style jsx>{`

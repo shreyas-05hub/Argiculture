@@ -45,8 +45,8 @@ const Contact = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          user_id: loggedUser.id,     // Send user ID
-          role: loggedUser.role,      // Send role
+          user_id: loggedUser.id,
+          role: loggedUser.role,
         }),
       });
 
@@ -86,6 +86,7 @@ const Contact = () => {
           className="position-absolute top-0 start-0 w-100 h-100"
           style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
         ></div>
+
         <div className="position-relative p-3">
           <h1 className="display-4 fw-bold">Contact Us</h1>
           <p className="lead mt-2">
@@ -96,9 +97,9 @@ const Contact = () => {
 
       {/* ===== Contact Form Section ===== */}
       <section
-        className=" bg-light py-5"
+        className="bg-light py-5"
         style={{
-          background: " #b3e6b1",
+          backgroundColor: "#b3e6b1",
           background:
             "linear-gradient(90deg, rgba(179, 230, 177, 1) 0%, rgba(179, 230, 177, 1) 88%)",
         }}
