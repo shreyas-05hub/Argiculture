@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
-import About from './pages/About'
+import About from './pages/AboutUs'
 import ModelHub from './pages/ModelHub'
 import Dashboard from './pages/Dashboard'
 import Marketplace from './pages/Marketplace'

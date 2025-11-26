@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import "../styles/AboutUs.css";
 
-
 export default function AboutUs() {
   const targetStats = [
     { label: "Farmers Connected", value: 50000, icon: "bi-people-fill" },
@@ -120,8 +119,9 @@ export default function AboutUs() {
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
         rel="stylesheet"
       />
+
       <main className="bg-light">
-        {/* Hero Section */}
+        {/* HERO SECTION */}
         <section className="hero-section position-relative overflow-hidden">
           <div className="hero-overlay"></div>
           <div className="container position-relative" style={{ zIndex: 2 }}>
@@ -140,14 +140,17 @@ export default function AboutUs() {
                 >
                   <i className="bi bi-flower3 display-1"></i>
                 </motion.div>
+
                 <h1 className="fw-bold display-3 mb-4">
                   Empowering Farmers with AI
                 </h1>
+
                 <p className="lead fs-4 mb-5 px-lg-5">
                   AgriBuy AI bridges farmers, traders, and industries using deep
                   learning to ensure fair trade, crop intelligence, and
                   profitable agriculture.
                 </p>
+
                 <div className="d-flex gap-3 justify-content-center flex-wrap">
                   <a
                     href="#features"
@@ -156,6 +159,7 @@ export default function AboutUs() {
                     <i className="bi bi-rocket-takeoff me-2"></i>
                     Explore Features
                   </a>
+
                   <a
                     href="#team"
                     className="btn btn-outline-light btn-lg px-5 py-3 rounded-pill"
@@ -167,6 +171,7 @@ export default function AboutUs() {
               </motion.div>
             </div>
           </div>
+
           <div className="hero-shapes">
             <div className="shape shape-1"></div>
             <div className="shape shape-2"></div>
@@ -174,7 +179,7 @@ export default function AboutUs() {
           </div>
         </section>
 
-        {/* Stats Section */}
+        {/* STATS SECTION */}
         <section
           className="stats-section py-5 position-relative"
           style={{ marginTop: "-80px", zIndex: 3 }}
@@ -205,7 +210,7 @@ export default function AboutUs() {
           </div>
         </section>
 
-        {/* Features Section */}
+        {/* FEATURES SECTION */}
         <section id="features" className="py-5 my-5">
           <div className="container">
             <motion.div
@@ -221,6 +226,7 @@ export default function AboutUs() {
                 into a data-driven, transparent industry.
               </p>
             </motion.div>
+
             <div className="row g-4">
               {features.map((f, index) => (
                 <motion.div
@@ -251,7 +257,7 @@ export default function AboutUs() {
           </div>
         </section>
 
-        {/* Mission & Vision */}
+        {/* MISSION & VISION */}
         <section className="mv-section py-5 my-5 bg-gradient">
           <div className="container">
             <div className="row align-items-center g-5">
@@ -276,6 +282,7 @@ export default function AboutUs() {
                       markets.
                     </p>
                   </div>
+
                   <div>
                     <div className="d-flex align-items-center mb-3">
                       <div className="vision-icon me-3">
@@ -290,6 +297,7 @@ export default function AboutUs() {
                   </div>
                 </div>
               </motion.div>
+
               <motion.div
                 initial={{ opacity: 0, x: 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -302,6 +310,7 @@ export default function AboutUs() {
                     <i className="bi bi-graph-up-arrow text-success me-2"></i>
                     Our Impact in 2025
                   </h3>
+
                   <div className="row g-3">
                     {stats.map((s, idx) => (
                       <div className="col-6" key={s.label}>
@@ -335,7 +344,7 @@ export default function AboutUs() {
           </div>
         </section>
 
-        {/* Team Section */}
+        {/* TEAM SECTION */}
         <section id="team" className="py-5 my-5">
           <div className="container">
             <motion.div
@@ -350,6 +359,7 @@ export default function AboutUs() {
                 Passionate experts driving agricultural innovation
               </p>
             </motion.div>
+
             <div className="row g-4 justify-content-center">
               {team.map((member, idx) => (
                 <motion.div
@@ -385,6 +395,7 @@ export default function AboutUs() {
                         </div>
                       </div>
                     </div>
+
                     <div className="p-4 text-center">
                       <h5 className="fw-bold mb-1">{member.name}</h5>
                       <p className="text-success mb-2 fw-semibold">
@@ -400,7 +411,7 @@ export default function AboutUs() {
           </div>
         </section>
 
-        {/* Call to Action */}
+        {/* CTA SECTION */}
         <section className="cta-section py-5 my-5">
           <div className="container">
             <motion.div
@@ -411,24 +422,23 @@ export default function AboutUs() {
               className="cta-card bg-success text-white rounded-4 shadow-lg p-5 text-center"
             >
               <i className="bi bi-rocket-takeoff display-3 mb-4"></i>
+
               <h2 className="fw-bold display-5 mb-3">
                 Ready to Transform Agriculture?
               </h2>
+
               <p className="lead mb-4 px-lg-5">
                 Join thousands of farmers already benefiting from our AI-powered
                 platform
               </p>
+
               <button className="btn btn-light btn-lg text-success fw-semibold px-5 py-3 rounded-pill">
                 Get Started Today <i className="bi bi-arrow-right ms-2"></i>
               </button>
             </motion.div>
           </div>
         </section>
-
-
       </main>
     </>
   );
-};
-
-export default AboutUs;
+}

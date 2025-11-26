@@ -358,10 +358,10 @@ const FarmerDashboard = () => {
         <div className="col-md-3 mb-3">
           <div className="card text-center p-3 shadow-sm h-100 border-0">
             <div className="card-body">
-              <i className="bi bi-geo-alt text-info fs-4 mb-2"></i>
-              <h6 className="card-title text-muted">Farm Size</h6>
+              <i className="bi bi-currency-rupee text-info fs-4 mb-2"></i>
+              <h6 className="card-title text-muted">Total Earnings</h6>
               <p className="card-text fs-5 fw-bold text-info">
-                {farmer.acres || "N/A"} Acres
+                {farmer.totalEarnings || "N/A"} 
               </p>
             </div>
           </div>
