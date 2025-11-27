@@ -14,14 +14,12 @@
 
 /* ==================== HERO SECTION ==================== */
 .hero-section {
-    background: linear-gradient(135deg, rgba(16, 85, 24, 0.95), rgba(25, 135, 84, 0.92)),
-        url("../assets/home-section.gif") center/cover no-repeat;
-    min-height: 100vh;
+    background: linear-gradient(135deg, rgba(103, 237, 119, 0.95), rgba(106, 235, 174, 0.92));
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 80px 20px 60px;
+    padding: 30px 10px 20px;
     position: relative;
     overflow: hidden;
 }
@@ -99,6 +97,7 @@
     line-height: 1.2;
     margin-bottom: 1.5rem;
     letter-spacing: -1px;
+    text-shadow: 2px 2px 2px black;
 }
 
 .gradient-text {
@@ -115,6 +114,7 @@
     max-width: 700px;
     margin: 0 auto;
     font-weight: 400;
+    text-shadow: 2px 2px 2px black;
 }
 
 .btn-hero {

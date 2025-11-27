@@ -189,7 +189,7 @@ const Contact = () => {
                 style={{ height: "300px", overflow: "hidden" }}
               >
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18..."
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3805.2751287438296!2d78.40061497521282!3d17.49437508341112!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb91f20663c46d%3A0x846796db82f76735!2sSocial%20Prachar!5e0!3m2!1sen!2sus!4v1764233321722!5m2!1sen!2sus"
                   allowFullScreen
                   loading="lazy"
                   style={{ border: 0, borderRadius: "10px" }}

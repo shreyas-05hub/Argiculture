@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/Home.css";
 import { Link } from "react-router-dom";
 
+
 const Home = () => {
   const [stats, setStats] = useState({
     farmers: 0,
@@ -49,18 +50,27 @@ const Home = () => {
   return (
     <div className="homepage">
       {/* Hero Section */}
-      <header className="hero-section text-center text-white d-flex align-items-center justify-content-center">
+      <header
+        className="hero-section text-center text-white d-flex align-items-center justify-content-center"
+        style={{
+          backgroundImage: "url('../assets/home-section.gif')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          minHeight: "100vh",
+        }}
+      >
         <div className="hero-content">
-          <div className="hero-badge mb-3">
-            <span className="badge bg-success-soft px-4 py-2">
+          <div className="hero-badge mb-2">
+            <span className="badge bg-success-soft px-3 py-1 ">
               🚀 AI-Powered Agricultural Marketplace
             </span>
           </div>
-          <h1 className="hero-title mb-4">
+          <h1 className="hero-title mb-3">
             Transform Agriculture with
             <span className="gradient-text d-block">Intelligent Trading</span>
           </h1>
-          <p className="hero-subtitle mb-5">
+          <p className="hero-subtitle mb-4 fw-bold">
             Connect farmers directly with customers through AI-driven crop
             analysis, fair pricing, and smart matching. Join the future of
             agricultural commerce.
@@ -68,22 +78,22 @@ const Home = () => {
           <div className="hero-cta">
             <Link
               to="/signup?role=farmer"
-              className="btn btn-hero btn-primary btn-lg m-2"
+              className="btn btn-hero btn-primary btn-lg m-1"
             >
               <span>Join as Farmer</span>
-              <i className="ms-2">🌾</i>
+              <i className="ms-1">🌾</i>
             </Link>
             <Link
               to="/signup?role=enduser"
-              className="btn btn-hero btn-outline-light btn-lg m-2"
+              className="btn btn-hero btn-outline-light btn-lg m-1"
             >
               <span>Join as Customer</span>
-              <i className="ms-2">🛒</i>
+              <i className="ms-1">🛒</i>
             </Link>
           </div>
 
           {/* Trust Indicators */}
-          <div className="hero-stats mt-5">
+          <div className="hero-stats mt-4">
             <div className="row g-4 justify-content-center">
               <div className="col-auto">
                 <div className="stat-item">
