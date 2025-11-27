@@ -15,12 +15,15 @@ const CropCard = ({
   onAdminAccept,
   onAdminReject,
   reason 
-}) => {
+}
+
+) => {
+  console.log("image prop:", image);
   return (
     <div className="crop-card-grid">
       <div className="crop-image-container">
         <img 
-          src={image || "../assets/default-crop.jpg"} 
+          src={image}
           alt={name}
           className="crop-img"
         />

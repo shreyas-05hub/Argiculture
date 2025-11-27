@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import "./AddCropAnimation.css";
 
 const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
   const [phase, setPhase] = useState("form");
@@ -8,27 +9,37 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
     location: "",
     quantity: "",
     description: "",
-    image: null
+    image: [],
   });
+  
   const [aiResult, setAiResult] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreviews, setImagePreviews] = useState([]);
 
   const delay = (ms) => new Promise(res => setTimeout(res, ms));
+
+  const handleFileChange = (files) => {
+    if (!files || files.length === 0) return;
+    const selectedFiles = Array.from(files).slice(0, 5);
+    const previews = selectedFiles.map(file => URL.createObjectURL(file));
+    setImagePreviews(previews);
+    setFormData(prev => ({
+      ...prev,
+      image: selectedFiles
+    }));
+  };
 
   const simulateAIProcessing = async () => {
     setIsSubmitting(true);
     setPhase("analyzing");
-    
-    // Simulate image analysis
+
     await delay(1500);
     setPhase("grading");
     await delay(1200);
-    
-    // Simulate market analysis
+
     setPhase("marketAnalysis");
     await delay(1000);
-    
-    // Generate AI results
+
     const result = {
       grade: ["A", "B", "C"][Math.floor(Math.random() * 3)],
       predictedPrice: Math.round(1800 + Math.random() * 1200),
@@ -37,7 +48,7 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
       qualityFactors: ["Good Color", "Proper Size", "Fresh Produce"],
       improvements: ["Better Packaging", "Harvest Timing"]
     };
-    
+
     setAiResult(result);
     setPhase("results");
     setIsSubmitting(false);
@@ -51,11 +62,16 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
   };
 
   const handleAddCrop = () => {
+    const finalPayload = {
+      ...formData,
+      mlResult: aiResult
+    };
+
+    // ✅ FULL DETAILS including description printed in console
+    console.log("FINAL CROP DATA:", finalPayload);
+
     if (onAddCrop) {
-      onAddCrop({
-        ...formData,
-        mlResult: aiResult
-      });
+      onAddCrop(finalPayload);
     }
     onClose();
   };
@@ -66,8 +82,9 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
       location: "",
       quantity: "",
       description: "",
-      image: null
+      image: []
     });
+    setImagePreviews([]);
     setAiResult(null);
     setPhase("form");
     setIsSubmitting(false);
@@ -114,6 +131,7 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
             className="modal-dialog modal-lg modal-dialog-centered"
           >
             <div className="modal-content border-0 shadow-lg">
+              
               {/* Header */}
               <div className="modal-header bg-success text-white border-0">
                 <h5 className="modal-title">
@@ -132,6 +150,7 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
               </div>
 
               <div className="modal-body p-4">
+
                 {/* FORM PHASE */}
                 {phase === "form" && (
                   <motion.div
@@ -141,7 +160,8 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                     className="form-phase"
                   >
                     <div className="row g-3">
-                      {/* Image Upload */}
+
+                      {/* IMAGE UPLOAD */}
                       <div className="col-12">
                         <label className="form-label fw-semibold">Crop Images</label>
                         <div 
@@ -151,7 +171,7 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                           <i className="bi bi-cloud-arrow-up fs-1 text-muted"></i>
                           <p className="mt-2 mb-1">Click to upload crop images</p>
                           <small className="text-muted">
-                            Max 5 images • JPG, PNG formats • Clear, well-lit photos work best
+                            Max 5 images • JPG, PNG formats • Clear photos preferred
                           </small>
                           <input
                             type="file"
@@ -159,36 +179,52 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                             className="d-none"
                             multiple
                             accept=".jpg,.jpeg,.png"
-                            onChange={(e) => handleInputChange('image', e.target.files)}
+                            onChange={(e) => handleFileChange(e.target.files)}
                           />
+                          
+                          {imagePreviews.length > 0 && (
+                            <div className="image-previews mt-3">
+                              <div className="d-flex gap-2 flex-wrap justify-content-center">
+                                {imagePreviews.map((preview, index) => (
+                                  <div key={index} className="image-preview">
+                                    <img 
+                                      src={preview} 
+                                      alt={`Preview ${index + 1}`}
+                                      className="preview-img"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                              <small className="text-muted mt-2">
+                                {imagePreviews.length} image(s) selected
+                              </small>
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                      {/* Crop Name */}
                       <div className="col-md-6">
                         <label className="form-label fw-semibold">Crop Name *</label>
                         <input
                           type="text"
                           className="form-control"
-                          placeholder="e.g., Organic Wheat, Basmati Rice"
+                          placeholder="e.g., Organic Wheat"
                           value={formData.cropName}
                           onChange={(e) => handleInputChange('cropName', e.target.value)}
                         />
                       </div>
 
-                      {/* Location */}
                       <div className="col-md-6">
                         <label className="form-label fw-semibold">Location *</label>
                         <input
                           type="text"
                           className="form-control"
-                          placeholder="e.g., Punjab, Maharashtra"
+                          placeholder="e.g., Maharashtra"
                           value={formData.location}
                           onChange={(e) => handleInputChange('location', e.target.value)}
                         />
                       </div>
 
-                      {/* Quantity */}
                       <div className="col-md-6">
                         <label className="form-label fw-semibold">Quantity (kg) *</label>
                         <input
@@ -200,7 +236,6 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                         />
                       </div>
 
-                      {/* Expected Price (Optional) */}
                       <div className="col-md-6">
                         <label className="form-label fw-semibold">Expected Price (₹)</label>
                         <input
@@ -212,9 +247,9 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                         <small className="text-muted">Leave empty for AI price suggestion</small>
                       </div>
 
-                      {/* Description */}
+                      {/* DESCRIPTION INCLUDED */}
                       <div className="col-12">
-                        <label className="form-label fw-semibold">Description</label>
+                        <label className="form-label fw-semibold">Description *</label>
                         <textarea
                           className="form-control"
                           rows="3"
@@ -223,11 +258,12 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                           onChange={(e) => handleInputChange('description', e.target.value)}
                         ></textarea>
                       </div>
+
                     </div>
                   </motion.div>
                 )}
 
-                {/* AI PROCESSING PHASES */}
+                {/* PROCESSING PHASE */}
                 {(phase === "analyzing" || phase === "grading" || phase === "marketAnalysis") && (
                   <motion.div
                     key="processing"
@@ -235,7 +271,6 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                     animate={{ opacity: 1 }}
                     className="processing-phase text-center py-4"
                   >
-                    {/* Animated Icon */}
                     <motion.div
                       animate={{ 
                         rotate: 360,
@@ -250,14 +285,12 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                       <i className="bi bi-cpu fs-1 text-primary"></i>
                     </motion.div>
 
-                    {/* Progress Message */}
                     <h5 className="text-primary mb-3">
                       {phase === "analyzing" && "Analyzing Crop Images..."}
                       {phase === "grading" && "Determining Quality Grade..."}
                       {phase === "marketAnalysis" && "Analyzing Market Trends..."}
                     </h5>
 
-                    {/* Progress Bar */}
                     <div className="progress mb-3" style={{ height: "8px" }}>
                       <div 
                         className="progress-bar progress-bar-striped progress-bar-animated bg-success"
@@ -267,34 +300,6 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                         }}
                       ></div>
                     </div>
-
-                    {/* Processing Details */}
-                    <div className="processing-details">
-                      {phase === "analyzing" && (
-                        <p className="text-muted small">
-                          Checking image quality, color consistency, and visual features...
-                        </p>
-                      )}
-                      {phase === "grading" && (
-                        <p className="text-muted small">
-                          Evaluating size uniformity, freshness, and quality parameters...
-                        </p>
-                      )}
-                      {phase === "marketAnalysis" && (
-                        <p className="text-muted small">
-                          Comparing with current market prices and demand trends...
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Loading Dots */}
-                    <motion.div
-                      animate={{ opacity: [0.3, 1, 0.3] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      className="text-muted mt-3"
-                    >
-                      Processing<span>.</span><span>.</span><span>.</span>
-                    </motion.div>
                   </motion.div>
                 )}
 
@@ -306,7 +311,6 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                     animate={{ opacity: 1, scale: 1 }}
                     className="results-phase"
                   >
-                    {/* Success Icon */}
                     <div className="text-center mb-4">
                       <motion.div
                         initial={{ scale: 0 }}
@@ -319,21 +323,18 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                       <h5 className="text-success">Analysis Complete!</h5>
                     </div>
 
-                    {/* Results Grid */}
                     <div className="row g-3">
-                      {/* Grade Card */}
+
+                      {/* GRADE CARD */}
                       <div className="col-md-6">
-                        <motion.div
-                          initial={{ x: -50, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ delay: 0.2 }}
+                        <div
                           className="card border-0 shadow-sm h-100"
                           style={{ borderLeft: `4px solid ${getGradeColor(aiResult.grade)}` }}
                         >
                           <div className="card-body text-center">
                             <h6 className="card-title text-muted">CROP GRADE</h6>
                             <div 
-                              className="grade-display fs-2 fw-bold mb-2"
+                              className="fs-2 fw-bold mb-2"
                               style={{ color: getGradeColor(aiResult.grade) }}
                             >
                               {aiResult.grade}
@@ -342,43 +343,34 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                               {getGradeDescription(aiResult.grade)}
                             </p>
                           </div>
-                        </motion.div>
+                        </div>
                       </div>
 
-                      {/* Price Card */}
+                      {/* PRICE CARD */}
                       <div className="col-md-6">
-                        <motion.div
-                          initial={{ x: 50, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          transition={{ delay: 0.3 }}
+                        <div
                           className="card border-0 shadow-sm h-100"
                           style={{ borderLeft: "4px solid #28a745" }}
                         >
                           <div className="card-body text-center">
                             <h6 className="card-title text-muted">SUGGESTED PRICE</h6>
-                            <div className="price-display fs-2 fw-bold text-success mb-2">
+                            <div className="fs-2 fw-bold text-success mb-2">
                               ₹{aiResult.predictedPrice}
                             </div>
                             <p className="small text-muted mb-0">
                               Per kilogram • {aiResult.marketTrend}
                             </p>
                           </div>
-                        </motion.div>
+                        </div>
                       </div>
 
-                      {/* Additional Info */}
                       <div className="col-12">
-                        <motion.div
-                          initial={{ y: 20, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 0.4 }}
-                          className="card border-0 bg-light"
-                        >
+                        <div className="card border-0 bg-light">
                           <div className="card-body">
                             <h6 className="card-title">Analysis Details</h6>
                             <div className="row">
                               <div className="col-md-6">
-                                <strong>Confidence Score:</strong> {aiResult.confidence}%
+                                <strong>Confidence:</strong> {aiResult.confidence}%
                               </div>
                               <div className="col-md-6">
                                 <strong>Market Trend:</strong> {aiResult.marketTrend}
@@ -386,42 +378,25 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                               <div className="col-12 mt-2">
                                 <strong>Quality Factors:</strong> {aiResult.qualityFactors.join(", ")}
                               </div>
-                              {aiResult.improvements && (
-                                <div className="col-12 mt-2">
-                                  <strong>Suggestions:</strong> {aiResult.improvements.join(", ")}
-                                </div>
-                              )}
+                              <div className="col-12 mt-2">
+                                <strong>Improvements:</strong> {aiResult.improvements.join(", ")}
+                              </div>
                             </div>
                           </div>
-                        </motion.div>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Action Note */}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.6 }}
-                      className="alert alert-info mt-3"
-                    >
-                      <small>
-                        <strong>Next:</strong> Review the AI suggestions. You can agree to send this to admin 
-                        for approval or decline if you're not satisfied with the price.
-                      </small>
-                    </motion.div>
+                    </div>
                   </motion.div>
                 )}
               </div>
 
-              {/* Footer Buttons */}
               <div className="modal-footer border-0">
+
+                {/* FORM BUTTONS */}
                 {phase === "form" && (
                   <>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={onClose}
-                    >
+                    <button type="button" className="btn btn-secondary" onClick={onClose}>
                       Cancel
                     </button>
                     <button
@@ -436,6 +411,7 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                   </>
                 )}
 
+                {/* RESULTS BUTTONS */}
                 {phase === "results" && (
                   <>
                     <button
@@ -456,16 +432,14 @@ const AddCropAnimation = ({ isOpen, onClose, onAddCrop }) => {
                   </>
                 )}
 
+                {/* LOADING BUTTON */}
                 {(phase === "analyzing" || phase === "grading" || phase === "marketAnalysis") && (
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    disabled
-                  >
+                  <button type="button" className="btn btn-secondary" disabled>
                     <span className="spinner-border spinner-border-sm me-2"></span>
                     Processing...
                   </button>
                 )}
+
               </div>
             </div>
           </motion.div>
