@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
-import About from './pages/About'
+import AboutUs from './pages/AboutUs'
 import ModelHub from './pages/ModelHub'
 import Dashboard from './pages/Dashboard'
 import Marketplace from './pages/Marketplace'
@@ -51,7 +51,7 @@ const App = () => {
       <Navbar/>
       <Routes>
         <Route path='/' element={<Home/>}/>
-        <Route path='/about' element={<About/>}/>
+        <Route path='/about' element={<AboutUs/>}/>
         <Route path='/modelhub' element={<ModelHub/>}/>
         <Route path='/marketplace' element={<Marketplace/>}/>
         <Route path='/contact' element={<Contact/>}/>

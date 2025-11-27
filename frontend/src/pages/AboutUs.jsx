@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import "../styles/AboutUs.css";
 
 
-export default function AboutUs() {
+const AboutUs =()=> {
   const targetStats = [
     { label: "Farmers Connected", value: 50000, icon: "bi-people-fill" },
     { label: "Active Traders", value: 1200, icon: "bi-briefcase-fill" },
@@ -76,37 +77,50 @@ export default function AboutUs() {
       name: "Muneendra",
       role: "Data Science Lead",
       bio: "Pioneering AI applications in AgriTech with 10+ years of ML experience.",
-      img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=500&q=80",
+      img: "../assets/muneendra.jpg",
+      linkedin: "https://www.linkedin.com/in/veresi-muneendra-b86790295/",
+      email: "vmunendra63@gmail.com",
     },
     {
       name: "Nithin",
       role: "Data Science",
       bio: "Designs predictive models for market intelligence and price optimization.",
-      img: "https://images.unsplash.com/photo-1603415526960-f7e0328a2c3b?auto=format&fit=crop&w=500&q=80",
+      img: "../assets/nithin.jpg",
+      linkedin: "www.linkedin.com/in/nithin-bathala-78b933392",
+      email: "nithinbathala@gmail.com",
     },
     {
       name: "Rajitha",
       role: "Data Science",
       bio: "Designs predictive models for market intelligence and price optimization.",
-      img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=500&q=80",
+      img: "../assets/rajitha.jpg",
+      linkedin: "https://www.linkedin.com/in/pathuri-rajitha-0aa005254",
+      email: "pathurirajitha76@gmail.com",
     },
     {
       name: "Shreyas",
       role: "Full Stack",
       bio: "Builds scalable cloud-based solutions for seamless farmer-trader interactions.",
-      img: "https://images.unsplash.com/photo-1614289379988-2a3b0d4d8f85?auto=format&fit=crop&w=500&q=80",
+      img: "../assets/shreyas.jpg",
+      linkedin: "https://www.linkedin.com/in/shreyas-kandekar",
+      email: "",
     },
     {
       name: "Mohan",
       role: "Full Stack",
       bio: "Architects secure APIs and data pipelines for high-volume Agri data.",
-      img: "https://images.unsplash.com/photo-1502767089025-6572583495b4?auto=format&fit=crop&w=500&q=80",
+      img: "../assets/mohan.jpg",
+      linkedin:
+        "https://www.linkedin.com/in/tippa-mohan-siva-sri-maruthi-0b9b2535a/",
+      email: "tippamohan580@gmail.com",
     },
     {
       name: "Prudhvi",
       role: "Full Stack",
       bio: "Designs intuitive and responsive interfaces for users across all devices.",
       img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=500&q=80",
+      linkedin: "",
+      email: "",
     },
   ];
 
@@ -371,13 +385,14 @@ export default function AboutUs() {
                       <div className="team-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
                         <div className="social-links">
                           <a
-                            href="#"
+                            href={member.linkedin}
+                            target="_blank"
                             className="btn btn-light btn-sm rounded-circle me-2"
                           >
                             <i className="bi bi-linkedin"></i>
                           </a>
                           <a
-                            href="#"
+                            href={`mailto:${member.email}`}
                             className="btn btn-light btn-sm rounded-circle"
                           >
                             <i className="bi bi-envelope"></i>

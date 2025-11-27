@@ -1,98 +1,117 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import AdminLayout from "../components/AdminLayout";
+import { toast } from "react-toastify";
+
 const Reports = () => {
   const [requests, setRequests] = useState([]);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectForId, setRejectForId] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
-  
+
   useEffect(() => {
-    refresh();
+    fetchRequests();
   }, []);
 
-  const refresh = () => {
-    const stored = JSON.parse(localStorage.getItem("cropRequests")) || [];
-    // Sort by timestamp descending (newest first)
-    const sorted = stored.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-    setRequests(sorted);
+  // Fetch all crop requests (pending/accepted/rejected)
+  const fetchRequests = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/marketplace/crops");
+      const data = await res.json();
+      setRequests(data.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)));
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load requests.");
+    }
   };
 
-  const acceptRequest = (reqId) => {
-    const stored = JSON.parse(localStorage.getItem("cropRequests")) || [];
-    const updated = stored.map((r) =>
-      r.id === reqId ? { ...r, status: "Accepted", timestamp: Date.now() } : r
-    );
-    localStorage.setItem("cropRequests", JSON.stringify(updated));
-
-    // Update crops array to mark the crop as Accepted
-    const storedCrops = JSON.parse(localStorage.getItem("crops")) || [];
-    const targetReq = stored.find((s) => s.id === reqId);
-    const reconciled = storedCrops.map((c) =>
-      c.id === targetReq?.cropId
-        ? { ...c, status: "Accepted", reason: "" }
-        : c
-    );
-    localStorage.setItem("crops", JSON.stringify(reconciled));
-
-    refresh();
-    alert("Request accepted successfully.");
+  // Accept crop request
+  const acceptRequest = async (reqId) => {
+    try {
+      const res = await fetch(
+        `http://localhost:5000/marketplace/crops/accept/${reqId}`,
+        {
+          method: "POST",
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Request accepted successfully.");
+        fetchRequests(); // refresh table
+      } else {
+        toast.error(data.message || "Failed to accept request.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Server error while accepting request.");
+    }
   };
 
+  // Open reject modal
   const openRejectModal = (reqId) => {
     setRejectForId(reqId);
     setRejectReason("");
     setShowRejectModal(true);
   };
 
-  const submitReject = () => {
+  // Submit rejection
+  const submitReject = async () => {
     if (!rejectReason.trim()) {
-      alert("Please enter a reason for rejection.");
+      toast.warning("Please enter a reason for rejection.");
       return;
     }
-
-    const stored = JSON.parse(localStorage.getItem("cropRequests")) || [];
-    const updated = stored.map((r) =>
-      r.id === rejectForId
-        ? {
-            ...r,
-            status: "Rejected",
-            reason: rejectReason,
-            timestamp: Date.now(),
-          }
-        : r
-    );
-    localStorage.setItem("cropRequests", JSON.stringify(updated));
-
-    // Update crops array with rejection and reason
-    const storedCrops = JSON.parse(localStorage.getItem("crops")) || [];
-    const targetReq = updated.find((u) => u.id === rejectForId);
-    const reconciled = storedCrops.map((c) =>
-      c.id === targetReq.cropId
-        ? { ...c, status: "Rejected", reason: rejectReason }
-        : c
-    );
-    localStorage.setItem("crops", JSON.stringify(reconciled));
-
-    setShowRejectModal(false);
-    setRejectForId(null);
-    setRejectReason("");
-    refresh();
-    alert("Request rejected.");
+    try {
+      const res = await fetch(
+        `http://localhost:5000/marketplace/crops/reject/${rejectForId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: rejectReason }),
+        }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Request rejected successfully.");
+        setShowRejectModal(false);
+        setRejectForId(null);
+        setRejectReason("");
+        fetchRequests();
+      } else {
+        toast.error(data.message || "Failed to reject request.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Server error while rejecting request.");
+    }
   };
 
-  const removeRequest = (reqId) => {
-    const stored = JSON.parse(localStorage.getItem("cropRequests")) || [];
-    const updated = stored.filter((r) => r.id !== reqId);
-    localStorage.setItem("cropRequests", JSON.stringify(updated));
-    refresh();
+  // Remove rejected request from table
+  const removeRequest = async (reqId) => {
+    try {
+      const res = await fetch(
+        `http://localhost:5000/marketplace/crops/${reqId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (res.ok) {
+        toast.success("Request removed.");
+        fetchRequests();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to remove request.");
+    }
   };
 
   return (
     <AdminLayout>
-      <div className="container-fluid mt-4">
+      <div className="container-fluid mt-4" style={{ height: "100vh" }}>
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="mb-0">Crop Requests Management</h2>
-          <button className="btn btn-outline-primary btn-sm" onClick={refresh}>
+          <button
+            className="btn btn-outline-primary btn-sm"
+            onClick={fetchRequests}
+          >
             🔄 Refresh
           </button>
         </div>
@@ -119,7 +138,7 @@ const Reports = () => {
                 <tbody>
                   {requests.length > 0 ? (
                     requests.map((r, idx) => (
-                      <tr key={r.id}>
+                      <tr key={r._id}>
                         <td>{idx + 1}</td>
                         <td>
                           <strong>{r.farmerName}</strong>
@@ -134,15 +153,21 @@ const Reports = () => {
                         </td>
                         <td>{r.location || "—"}</td>
                         <td>
-                          <span className={`badge ${
-                            r.status === 'Pending' ? 'bg-warning' :
-                            r.status === 'Accepted' ? 'bg-success' :
-                            'bg-danger'
-                          }`}>
+                          <span
+                            className={`badge ${
+                              r.status === "Pending"
+                                ? "bg-warning"
+                                : r.status === "Accepted"
+                                ? "bg-success"
+                                : "bg-danger"
+                            }`}
+                          >
                             {r.status}
                           </span>
                         </td>
-                        <td style={{ maxWidth: "200px", wordBreak: "break-word" }}>
+                        <td
+                          style={{ maxWidth: "200px", wordBreak: "break-word" }}
+                        >
                           {r.reason || "—"}
                         </td>
                         <td>
@@ -150,13 +175,13 @@ const Reports = () => {
                             <div className="btn-group btn-group-sm">
                               <button
                                 className="btn btn-success"
-                                onClick={() => acceptRequest(r.id)}
+                                onClick={() => acceptRequest(r._id)}
                               >
                                 Accept
                               </button>
                               <button
                                 className="btn btn-danger"
-                                onClick={() => openRejectModal(r.id)}
+                                onClick={() => openRejectModal(r._id)}
                               >
                                 Reject
                               </button>
@@ -170,7 +195,7 @@ const Reports = () => {
                           {r.status === "Rejected" && (
                             <button
                               className="btn btn-outline-danger btn-sm"
-                              onClick={() => removeRequest(r.id)}
+                              onClick={() => removeRequest(r._id)}
                             >
                               Remove
                             </button>
@@ -228,8 +253,8 @@ const Reports = () => {
                 </div>
 
                 <div className="modal-footer">
-                  <button 
-                    className="btn btn-danger" 
+                  <button
+                    className="btn btn-danger"
                     onClick={submitReject}
                     disabled={!rejectReason.trim()}
                   >
@@ -253,9 +278,18 @@ const Reports = () => {
       </div>
 
       <style jsx>{`
-        .grade-A { background: #d4edda; color: #155724; }
-        .grade-B { background: #fff3cd; color: #f0b609ff; }
-        .grade-C { background: #f8d7da; color: #721c24; }
+        .grade-A {
+          background: #d4edda;
+          color: #155724;
+        }
+        .grade-B {
+          background: #fff3cd;
+          color: #f0b609ff;
+        }
+        .grade-C {
+          background: #f8d7da;
+          color: #721c24;
+        }
       `}</style>
     </AdminLayout>
   );
