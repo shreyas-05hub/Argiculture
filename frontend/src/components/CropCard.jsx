@@ -1,29 +1,40 @@
 import React from "react";
 import "../styles/CropCard.css";
 
+const statusColors = {
+  ModelSuggested: "#4F46E5",
+  Pending: "#F59E0B",
+  Accepted: "#10B981",
+  Rejected: "#EF4444",
+  Declined: "#EF4444", // Assuming similar to Rejected
+};
+
 const CropCard = ({ 
-  image, 
-  name, 
+  id,
+  cropName: name, 
   quantity, 
-  location, 
-  price, 
+  location = "", // Optional, as in old
+  pricePerKg: price, 
+  totalAmount,
   grade, 
-  marketTrend,
+  marketTrend, // Optional, as in old
   status,
-  onAgree,
-  onDecline,
+  description, // New prop
+  images = [],
+  userType, // "farmer" or "admin"
+  reason, // Optional, as in old
+
+  onFarmerAgree: onAgree,
+  onFarmerDecline: onDecline,
   onAdminAccept,
   onAdminReject,
-  reason 
-}
-
-) => {
-  console.log("image prop:", image);
+}) => {
+  console.log("images prop:", images);
   return (
     <div className="crop-card-grid">
       <div className="crop-image-container">
         <img 
-          src={image}
+          src={images[0] || "/placeholder.jpg"}
           alt={name}
           className="crop-img"
         />
@@ -40,34 +51,61 @@ const CropCard = ({
         <div className="crop-meta">
           <div className="meta-item">
             <span className="meta-label">Qty:</span>
-            <span className="meta-value">{quantity}</span>
+            <span className="meta-value">{quantity} kg</span>
           </div>
-          <div className="meta-item">
-            <span className="meta-label">Location:</span>
-            <span className="meta-value">{location}</span>
-          </div>
+          {location && (
+            <div className="meta-item">
+              <span className="meta-label">Location:</span>
+              <span className="meta-value">{location}</span>
+            </div>
+          )}
           <div className="meta-item">
             <span className="meta-label">Price:</span>
-            <span className="meta-value">₹{price}</span>
+            <span className="meta-value">₹{price} /kg</span>
           </div>
+          {totalAmount && (
+            <div className="meta-item">
+              <span className="meta-label">Total:</span>
+              <span className="meta-value">₹{totalAmount}</span>
+            </div>
+          )}
           <div className="meta-item">
             <span className="meta-label">Grade:</span>
             <span className={`grade-value grade-${grade}`}>{grade}</span>
           </div>
         </div>
 
+        {/* Description */}
+        {description && (
+          <div className="crop-description">
+            <small><strong>Description:</strong> {description}</small>
+          </div>
+        )}
+
         {/* Status-based rendering */}
         {status === "ModelSuggested" && (
           <div className="action-buttons">
             <p className="agreement-prompt">Do you agree with AI suggestions?</p>
-            <div className="btn-group-grid">
-              <button className="btn-agree" onClick={onAgree}>
-                👍 Yes, Send to Admin
-              </button>
-              <button className="btn-decline" onClick={onDecline}>
-                👎 No, Decline
-              </button>
-            </div>
+            {userType === "farmer" && (
+              <div className="btn-group-grid">
+                <button className="btn-agree" onClick={() => onAgree(id)}>
+                  👍 Yes, Send to Admin
+                </button>
+                <button className="btn-decline" onClick={() => onDecline(id)}>
+                  👎 No, Decline
+                </button>
+              </div>
+            )}
+            {userType === "admin" && (
+              <div className="btn-group-grid">
+                <button className="btn-accept" onClick={() => onAdminAccept(id)}>
+                  Approve
+                </button>
+                <button className="btn-reject" onClick={() => onAdminReject(id)}>
+                  Reject
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -79,18 +117,18 @@ const CropCard = ({
             <div className="status-info">
               <small className="text-muted">Your request is with the admin team</small>
             </div>
-            {/* Admin Demo Buttons */}
-            <div className="admin-actions mt-2">
-              <small className="text-muted d-block mb-1">Admin Demo:</small>
-              <div className="btn-group-sm d-flex gap-1">
-                <button className="btn btn-success btn-sm flex-fill" onClick={onAdminAccept}>
-                  Accept
-                </button>
-                <button className="btn btn-danger btn-sm flex-fill" onClick={onAdminReject}>
-                  Reject
-                </button>
+            {userType === "admin" && (
+              <div className="admin-actions mt-2">
+                <div className="btn-group-sm d-flex gap-1">
+                  <button className="btn btn-success btn-sm flex-fill" onClick={() => onAdminAccept(id)}>
+                    Accept
+                  </button>
+                  <button className="btn btn-danger btn-sm flex-fill" onClick={() => onAdminReject(id)}>
+                    Reject
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         )}
 

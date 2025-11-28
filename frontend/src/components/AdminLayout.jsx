@@ -25,7 +25,7 @@ const AdminLayout = ({ children }) => {
             </Link>
 
             <Link to="/marketmanagement" className="list-group-item">
-              Market Management
+              MarketPlace Management
             </Link>
 
             <Link to="/query" className="list-group-item">

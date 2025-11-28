@@ -11,6 +11,15 @@ const getPreview = (img) => {
   return img;
 };
 
+// Add this helper (from AddCropAnimation)
+const fmt = (n) => {
+  if (isNaN(n) || n === null || n === 0) return "0";
+  return Number(n).toLocaleString("en-IN", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  });
+};
+
 const FarmerDashboard = () => {
   const [showAddCropAnimation, setShowAddCropAnimation] = useState(false);
   const [crops, setCrops] = useState([]);
@@ -31,7 +40,6 @@ const FarmerDashboard = () => {
     if (logged && logged.role === "farmer") {
       setFarmer(logged);
     }
-
     const storedCrops = JSON.parse(localStorage.getItem("crops")) || [];
     if (logged) {
       const myCrops = storedCrops.filter(
@@ -54,11 +62,9 @@ const FarmerDashboard = () => {
   const callMlModel = async (cropData) => {
     // Simulate API call delay
     await new Promise((res) => setTimeout(res, 1500));
-
     // Generate realistic AI results
     const grades = ["A", "B", "C"];
     const marketTrends = ["High Demand", "Medium Demand", "Low Demand"];
-
     // Base price based on crop type (simplified)
     const basePrices = {
       wheat: 2000,
@@ -68,22 +74,18 @@ const FarmerDashboard = () => {
       cotton: 3000,
       default: 2200,
     };
-
     const cropName = cropData.cropName.toLowerCase();
     let basePrice = basePrices.default;
-
     if (cropName.includes("wheat")) basePrice = basePrices.wheat;
     else if (cropName.includes("rice")) basePrice = basePrices.rice;
     else if (cropName.includes("corn")) basePrice = basePrices.corn;
     else if (cropName.includes("sugarcane")) basePrice = basePrices.sugarcane;
     else if (cropName.includes("cotton")) basePrice = basePrices.cotton;
-
     const grade = grades[Math.floor(Math.random() * 3)];
     const gradeMultiplier = grade === "A" ? 1.2 : grade === "B" ? 1.0 : 0.8;
     const predictedPrice = Math.round(
       basePrice * gradeMultiplier + Math.random() * 500
     );
-
     return {
       grade: grade,
       predictedPrice: predictedPrice,
@@ -93,54 +95,64 @@ const FarmerDashboard = () => {
         0,
         2 + Math.floor(Math.random() * 2)
       ),
+
       improvements:
         Math.random() > 0.7 ? ["Better Packaging", "Harvest Timing"] : [],
     };
   };
 
-  // Main function to handle crop addition from animation
-  const handleAddCropFromAnimation = async (cropData) => {
-    if (!cropData.cropName || !cropData.quantity || !cropData.location) {
-      alert(
-        "Please fill all required fields: Crop Name, Quantity, and Location"
-      );
+  // UPDATED: Handle savedCrop from AddCropAnimation (normalized data)
+  const handleAddCropFromAnimation = async (savedCrop) => {
+    // Ensure required fields (backend/local provides them)
+    const cropName = savedCrop.cropName?.trim() || "";
+    const location = savedCrop.location?.trim() || "";
+    const quantity = Number(savedCrop.quantity) || 0;
+    const description = savedCrop.description || "";
+    const effectivePrice = savedCrop.priceByAI || mlResult?.predictedPrice || 0;
+    const effectiveGrade = savedCrop.grade || mlResult?.grade || "N/A";
+
+    if (!cropName || !location || !quantity || quantity <= 0) {
+      alert("Please fill all required fields: Crop Name, Quantity, and Location");
       return;
     }
 
     try {
-      // Call AI model for analysis
-      const mlResult = await callMlModel(cropData);
+      // Fallback ML if no result
+      let mlResult = savedCrop.mlResult;
+      if (!mlResult) {
+        mlResult = await callMlModel({ cropName, quantity, location });
+        savedCrop.mlResult = mlResult;
+      }
 
-      // Create new crop object
+      // Normalize for CropCard/table (add farmerName, finalAmount)
       const newCrop = {
-        id: Date.now(),
+        id: savedCrop.id || Date.now(),
         farmerName: farmer.username,
-        cropName: cropData.cropName,
-        quantity: cropData.quantity,
-        price: cropData.price || "",
-        location: cropData.location,
-        description: cropData.description || "",
-        image: cropData.image || null,
-        status: "ModelSuggested",
-        mlResult: mlResult,
-        reason: "",
-        timestamp: Date.now(),
+        cropName,
+        location,
+        quantity,
+        priceByAI: mlResult.predictedPrice || savedCrop.priceByAI || 0,
+        grade: mlResult.grade || savedCrop.grade || "N/A",
+        finalAmount: (mlResult.predictedPrice || savedCrop.priceByAI || 0) * quantity, // Calculate
+        created_at: savedCrop.created_at || new Date().toISOString(),
+        status: savedCrop.status || "ModelSuggested", // Force full
+       images: savedCrop.images || [],
+
+
+        description,
+        mlResult, // For legacy
       };
 
-      // Update state and localStorage
       const updatedCrops = [...crops, newCrop];
       saveCropsToStorage(updatedCrops);
 
-      // Show success message
       alert(
-        `Crop "${cropData.cropName}" added successfully! AI has graded it as ${mlResult.grade} with suggested price ₹${mlResult.predictedPrice}/kg`
-      );
-
-      // Close animation modal
+        `Crop "${cropName}" added! AI graded it "${effectiveGrade}" with price ₹${effectivePrice}/kg`
+      ); 
       setShowAddCropAnimation(false);
-    } catch (error) {
-      console.error("Error adding crop:", error);
-      alert("Failed to add crop. Please try again.");
+    } catch (err) {
+      console.error("Error adding crop:", err);
+      alert("Failed to add crop. Try again.");
     }
   };
 
@@ -150,14 +162,9 @@ const FarmerDashboard = () => {
       c.id === cropId ? { ...c, status: "Pending" } : c
     );
     saveCropsToStorage(updatedLocal);
-
-    const storedRequests =
-      JSON.parse(localStorage.getItem("cropRequests")) || [];
+    const storedRequests = JSON.parse(localStorage.getItem("cropRequests")) || [];
     const crop = updatedLocal.find((c) => c.id === cropId);
-
-    // Check if request already exists
     const exists = storedRequests.find((r) => r.cropId === cropId);
-
     if (!exists && crop) {
       const newRequest = {
         id: Date.now(),
@@ -165,20 +172,18 @@ const FarmerDashboard = () => {
         farmerName: crop.farmerName,
         cropName: crop.cropName,
         quantity: crop.quantity,
-        price: crop.mlResult?.predictedPrice || crop.price,
+        price: crop.mlResult?.predictedPrice || crop.priceByAI,
         location: crop.location,
         description: crop.description,
-        image: crop.image,
-        grade: crop.mlResult?.grade,
+        images: crop.images,
+        grade: crop.mlResult?.grade || crop.grade,
         marketTrend: crop.mlResult?.marketTrend,
         status: "Pending",
         reason: "",
         timestamp: Date.now(),
       };
-
       storedRequests.push(newRequest);
       localStorage.setItem("cropRequests", JSON.stringify(storedRequests));
-
       alert(`Request for "${crop.cropName}" sent to admin for approval!`);
     } else {
       alert("Request already sent to admin!");
@@ -220,6 +225,40 @@ const FarmerDashboard = () => {
       </div>
     );
   }
+
+  // Helper for image (returns URL for array[0])
+  // const getCropImage = (crop) => {
+  //   if (!crop.images || crop.images.length === 0) return "../assets/default-crop.jpg";
+  //   const firstImg = crop.images[0];
+  //   return getPreview(firstImg) || "../assets/default-crop.jpg";
+  // };
+
+  // Helper for image (returns full URL for array[0])
+const getCropImage = (crop) => {
+  if (!crop.images || crop.images.length === 0) 
+    return "../assets/default-crop.jpg";
+
+  const firstImg = crop.images[0];
+
+  // If it's a File object (new upload)
+  if (firstImg instanceof File) {
+    return URL.createObjectURL(firstImg);
+  }
+
+  // If backend returned a relative path
+  if (typeof firstImg === "string") {
+    const backendBase = "http://127.0.0.1:8000";
+
+    if (firstImg.startsWith("crop_images/")) {
+      return `${backendBase}/media/${firstImg}`;
+    }
+
+    return firstImg; // Already full URL
+  }
+
+  return "../assets/default-crop.jpg";
+};
+
 
   return (
     <div className="container-fluid mt-4 mb-4">
@@ -306,11 +345,13 @@ const FarmerDashboard = () => {
           </div>
         </div>
       </div>
-      {/* Add Crop Animation Modal */}
+      {/* Add Crop Animation Modal - Pass props for backend/fallback */}
       <AddCropAnimation
         isOpen={showAddCropAnimation}
         onClose={() => setShowAddCropAnimation(false)}
         onAddCrop={handleAddCropFromAnimation}
+        callMlModel={callMlModel}
+        farmerId={farmer.id}
       />
       {/* Watch Demo Modal */}
       <WatchDemoAnimation
@@ -367,59 +408,8 @@ const FarmerDashboard = () => {
           </div>
         </div>
       </div>
-      {/* NEW CROP SUGGESTIONS - Waiting for farmer approval */}
-      {/* <div className="mb-4">
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h4 className="fw-bold text-success">Recently Added Crops</h4>
-          <span className="badge bg-success">{crops.filter(c => c.status === "ModelSuggested").length}</span>
-        </div>
-        <p className="text-muted mb-3">
-          Crops analyzed by AI - Review the grade and price suggestions
-        </p>
-        
-        {crops.filter(c => c.status === "ModelSuggested").length > 0 ? (
-          <div className="row g-3">
-            {crops
-              .filter((c) => c.status === "ModelSuggested")
-              .map((crop) => (
-                <div className="col-xl-3 col-lg-4 col-md-6" key={crop.id}>
-                  <CropCard
-                   
-                    image={
-                      crop.image
-                        ? Array.isArray(crop.image)
-                          ? getPreview(crop.image[0])
-                          : getPreview(crop.image)
-                        : "../assets/default-crop.jpg"
-                    }
-                    name={crop.cropName}
-                    quantity={`${crop.quantity} kg`}
-                    location={crop.location}
-                    price={crop.mlResult?.predictedPrice || "N/A"}
-                    grade={crop.mlResult?.grade || "N/A"}
-                    marketTrend={crop.mlResult?.marketTrend}
-                    status={crop.status}
-                    onAgree={() => farmerAgrees(crop.id)}
-                    onDecline={() => farmerDeclines(crop.id)}
-                    reason={crop.reason}
-                  />
-                </div>
-              ))}
-          </div>
-        ) : (
-          <div className="text-center py-5 bg-light rounded">
-            <i className="bi bi-inbox fs-1 text-muted mb-3"></i>
-            <p className="text-muted">No crop suggestions available.</p>
-            <button 
-              className="btn btn-outline-success"
-              onClick={() => setShowAddCropAnimation(true)}
-            >
-              Add Your First Crop
-            </button>
-          </div>
-        )}
-      </div> */}
-      {/* // In the Recently Added Crops section, update the image prop: */}
+
+      {/* RECENTLY ADDED CROPS */}
       <div className="mb-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h4 className="fw-bold text-success">Recently Added Crops</h4>
@@ -430,51 +420,29 @@ const FarmerDashboard = () => {
         <p className="text-muted mb-3">
           Crops analyzed by AI - Review the grade and price suggestions
         </p>
-
         {crops.filter((c) => c.status === "ModelSuggested").length > 0 ? (
           <div className="row g-3">
             {crops
               .filter((c) => c.status === "ModelSuggested")
-              .map((crop) => {
-                // Enhanced image handling
-                const getCropImage = () => {
-                  if (!crop.image) return "../assets/default-crop.jpg";
+              .map((crop) => (
+                <div className="col-xl-3 col-lg-4 col-md-6" key={crop.id}>
+                  <CropCard
+                    id={crop.id}
+                    cropName={crop.cropName}
+                    quantity={crop.quantity}
+                    grade={crop.mlResult?.grade || crop.grade || "N/A"}
+                    pricePerKg={fmt(crop.mlResult?.predictedPrice || crop.priceByAI || 0)}
+                    totalAmount={fmt(crop.finalAmount || 0)}
+                    status={crop.status}
+                    description={crop.description}
+                    images={crop.images}
 
-                  // If it's an array of files
-                  if (Array.isArray(crop.image) && crop.image.length > 0) {
-                    const firstImage = crop.image[0];
-                    if (firstImage instanceof File) {
-                      return URL.createObjectURL(firstImage);
-                    }
-                    return "../assets/default-crop.jpg";
-                  }
-
-                  // If it's already a URL string
-                  if (typeof crop.image === "string") {
-                    return crop.image;
-                  }
-
-                  return "../assets/default-crop.jpg";
-                };
-
-                return (
-                  <div className="col-xl-3 col-lg-4 col-md-6" key={crop.id}>
-                    <CropCard
-                      image={getCropImage()}
-                      name={crop.cropName}
-                      quantity={`${crop.quantity} kg`}
-                      location={crop.location}
-                      price={crop.mlResult?.predictedPrice || "N/A"}
-                      grade={crop.mlResult?.grade || "N/A"}
-                      marketTrend={crop.mlResult?.marketTrend}
-                      status={crop.status}
-                      onAgree={() => farmerAgrees(crop.id)}
-                      onDecline={() => farmerDeclines(crop.id)}
-                      reason={crop.reason}
-                    />
-                  </div>
-                );
-              })}
+                    userType="farmer"
+                    onFarmerAgree={farmerAgrees}
+                    onFarmerDecline={farmerDeclines}
+                  />
+                </div>
+              ))}
           </div>
         ) : (
           <div className="text-center py-5 bg-light rounded">
@@ -489,25 +457,23 @@ const FarmerDashboard = () => {
           </div>
         )}
       </div>
-      {/* PROCESSING REQUESTS - Waiting for admin action */}
+
+      {/* PROCESSING REQUESTS */}
       <div className="mb-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h4 className="fw-bold text-warning">Processing Requests</h4>
           <span className="badge bg-warning">
-            {
-              crops.filter(
-                (c) =>
-                  c.status === "Pending" ||
-                  c.status === "Rejected" ||
-                  c.status === "Declined"
-              ).length
-            }
+            {crops.filter(
+              (c) =>
+                c.status === "Pending" ||
+                c.status === "Rejected" ||
+                c.status === "Declined"
+            ).length}
           </span>
         </div>
         <p className="text-muted mb-3">
           Crops waiting for admin approval or requiring action
         </p>
-
         {crops.filter(
           (c) =>
             c.status === "Pending" ||
@@ -525,27 +491,21 @@ const FarmerDashboard = () => {
               .map((crop) => (
                 <div className="col-xl-3 col-lg-4 col-md-6" key={crop.id}>
                   <CropCard
-                    image={
-                      crop.image
-                        ? Array.isArray(crop.image)
-                          ? getPreview(crop.image[0])
-                          : getPreview(crop.image)
-                        : "../assets/default-crop.jpg"
-                    }
-                    name={crop.cropName}
-                    quantity={`${crop.quantity} kg`}
-                    location={crop.location}
-                    price={crop.mlResult?.predictedPrice || "N/A"}
-                    grade={crop.mlResult?.grade || "N/A"}
-                    marketTrend={crop.mlResult?.marketTrend}
+                    id={crop.id}
+                    cropName={crop.cropName}
+                    quantity={crop.quantity}
+                    grade={crop.mlResult?.grade || crop.grade || "N/A"}
+                    pricePerKg={fmt(crop.mlResult?.predictedPrice || crop.priceByAI || 0)}
+                    totalAmount={fmt(crop.finalAmount || 0)}
                     status={crop.status}
-                    onAgree={() => farmerAgrees(crop.id)}
-                    onDecline={() => farmerDeclines(crop.id)}
-                    onAdminAccept={() => adminAccepts(crop.id)}
-                    onAdminReject={() =>
-                      adminRejects(crop.id, "Quality standards not met")
-                    }
-                    reason={crop.reason}
+                    description={crop.description}
+                    images={crop.images}
+
+                    userType="farmer"  // Change to "admin" for admin view
+                    onFarmerAgree={farmerAgrees}
+                    onFarmerDecline={farmerDeclines}
+                    onAdminAccept={adminAccepts}
+                    onAdminReject={adminRejects}
                   />
                 </div>
               ))}
@@ -556,7 +516,8 @@ const FarmerDashboard = () => {
           </div>
         )}
       </div>
-      {/* SOLD CROPS HISTORY */}
+
+      {/* PREVIOUSLY SOLD CROPS */}
       <div className="mb-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h4 className="fw-bold text-success">Previously Sold Crops</h4>
@@ -567,7 +528,6 @@ const FarmerDashboard = () => {
         <p className="text-muted mb-3">
           Successfully sold crops through the platform
         </p>
-
         {crops.filter((c) => c.status === "Accepted").length > 0 ? (
           <div className="row g-3">
             {crops
@@ -575,20 +535,17 @@ const FarmerDashboard = () => {
               .map((crop) => (
                 <div className="col-xl-3 col-lg-4 col-md-6" key={crop.id}>
                   <CropCard
-                    image={
-                      crop.image
-                        ? Array.isArray(crop.image)
-                          ? getPreview(crop.image[0])
-                          : getPreview(crop.image)
-                        : "../assets/default-crop.jpg"
-                    }
-                    name={crop.cropName}
-                    quantity={`${crop.quantity} kg`}
-                    location={crop.location}
-                    price={crop.mlResult?.predictedPrice || "N/A"}
-                    grade={crop.mlResult?.grade || "N/A"}
+                    id={crop.id}
+                    cropName={crop.cropName}
+                    quantity={crop.quantity}
+                    grade={crop.mlResult?.grade || crop.grade || "N/A"}
+                    pricePerKg={fmt(crop.mlResult?.predictedPrice || crop.priceByAI || 0)}
+                    totalAmount={fmt(crop.finalAmount || 0)}
                     status={crop.status}
-                    reason={crop.reason}
+                    description={crop.description}
+                    images={crop.images}
+
+                    userType="farmer"
                   />
                 </div>
               ))}
